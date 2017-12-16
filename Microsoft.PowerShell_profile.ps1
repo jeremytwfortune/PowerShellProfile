@@ -22,8 +22,8 @@ $Env:PERSONALLOG_AWSREGION = "us-east-1"
 $Env:PERSONALLOG_TABLENAME = "PersonalLog"
 $Env:PERSONALLOG_TIMEINDEX = "Time-index"
 $Env:PERSONALLOG_CACHEDIRECTORY = "$Home\.PersonalLogCache"
-$Env:PERSONALLOG_DEFAULTTAGS = "Work CareEvolution"
-$Env:PERSONALLOG_LOCATION = "Work JEREMYCE"
+$Env:PERSONALLOG_DEFAULTTAGS = "Personal"
+$Env:PERSONALLOG_LOCATION = "Home $Env:COMPUTERNAME"
 if ( ! ( Test-Path $Env:PERSONALLOG_CACHEDIRECTORY ) ) {
 	New-Item -Type Directory $Env:PERSONALLOG_CACHEDIRECTORY
 }
@@ -38,8 +38,6 @@ if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction Silent
 	$Env:PERSONALLOG_AWSACCESSKEY = $oAuthCredential.GetNetworkCredential().UserName
 	$Env:PERSONALLOG_AWSSECRETKEY = $oAuthCredential.GetNetworkCredential().Password
 }
-
-. "$(Split-Path $PROFILE)\CareEvolution.ps1"
 
 Set-Alias npp "C:\Program Files (x86)\Notepad++\notepad++.exe"
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
