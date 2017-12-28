@@ -32,7 +32,7 @@ function Initialize-LocalContentDev {
     $webConfig.save( "$GalileoRepoLocation\Galileo\web.config" )
 
     $galileoConnectionStrings = "$Home\Galileo.ConnectionStrings.config"
-    if ( Test-Path $galileoConnectionStrings ) {
+    if ( ! ( Test-Path $galileoConnectionStrings ) ) {
       Write-Verbose "Copying $galileoConnectionStrings to Galileo repository"
       Copy-Item -Force $galileoConnectionStrings $GalileoRepoLocation\Galileo\ConnectionStrings.config.default
     }
