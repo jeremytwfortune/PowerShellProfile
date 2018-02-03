@@ -17,6 +17,14 @@ function prompt {
 			$Path -Replace [regex]::Escape("Microsoft.PowerShell.Core\FileSystem::"), ""
 		}
 	}
+
+	if ( ! $Global:DirectoryHistory ) {
+		$Global:DirectoryHistory = @()
+	}
+	if ( ( $Global:DirectoryHistory.Count -Gt 0 -And $Global:DirectoryHistory[$Global:DirectoryHistory.Count - 1].Path -Ne ( Get-Location ).Path ) -Or ( $Global:DirectoryHistory.Count -Eq 0 ) ) {
+		$Global:DirectoryHistory += ( Get-Location )
+	}
+
 	Write-Host ""
 
 	Write-Host "$Env:USERNAME@$Env:USERDOMAIN " -NoNewline -ForegroundColor Magenta
