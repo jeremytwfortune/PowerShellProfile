@@ -7,7 +7,7 @@ Import-Module CredentialManager
 $Work = "$Home\Work"
 $Desk = "$Home\Desktop"
 $Repos = "$Home\Repos"
-$Drive = "$Home\Google Drive"
+$Drive = "G:\My Drive"
 $Ssms = "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\Binn\ManagementStudio\Ssms.exe"
 
 $Env:Path = "$Env:Path;$Home\Documents\WindowsPowerShell\Scripts"
