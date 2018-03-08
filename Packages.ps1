@@ -17,7 +17,8 @@ choco install -y `
 	conemu `
 	dashlane `
 	office365proplus `
-	vim
+	vim `
+	autohotkey
 
 if ( $Work ) {
 	choco install -y `
