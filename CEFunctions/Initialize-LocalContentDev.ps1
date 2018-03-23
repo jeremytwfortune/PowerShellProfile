@@ -1,5 +1,5 @@
 function Initialize-LocalContentDev {
-  param(
+  [CmdletBinding()] param(
     [switch] $SkipNarya,
     [string] $NaryaRepoLocation = $Env:NARYA_REPO,
     [switch] $SkipGalileo,

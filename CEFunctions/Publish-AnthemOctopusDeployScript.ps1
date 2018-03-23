@@ -11,6 +11,9 @@ function Publish-AnthemOctopusDeployScript {
 		[ValidateSet("Prod", "PerfTest", "QA")]
 		[String] $Tenant,
 
+		[ValidateSet("Galileo", "Narya")]
+		[String] $Project,
+
 		[Parameter(Mandatory)]
 		[String] $Version,
 
@@ -157,6 +160,11 @@ function Publish-AnthemOctopusDeployScript {
 
 	$environmentName = "Anthem $Environment"
 	$tenantName = "Anthem - $Tenant"
+	if ( $Project -Eq "Galileo" ) {
+		$projectName = "Galileo - Next"
+	} else {
+		$projectName = $Project
+	}
 
 	try {
 		if ( ! $KeepFiles ) {
@@ -166,7 +174,8 @@ function Publish-AnthemOctopusDeployScript {
 			-EnvironmentName $environmentName `
 			-TenantName $tenantName `
 			-OctopusApiKey $OctopusApiKey `
-			-ReleaseVersion $Version
+			-ReleaseVersion $Version `
+			-ProjectName $projectName
 		Invoke-Command -Session $Session -ArgumentList $Credential, $FtpServer -ScriptBlock {
 			param( $Credential, $Server )
 			Set-FTPConnection `
