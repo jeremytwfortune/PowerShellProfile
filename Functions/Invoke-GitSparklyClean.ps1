@@ -27,8 +27,8 @@ function Invoke-GitSparklyClean {
 		}
 
 		$results = Invoke-Expression $command
-		if ( $results ) {
-			Write-Verbose $results
+		foreach ( $result in $results ) {
+			Write-Verbose $result
 		}
 		if ( $DryRun ) {
 			$results = @()
