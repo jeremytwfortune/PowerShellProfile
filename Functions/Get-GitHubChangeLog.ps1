@@ -18,6 +18,7 @@ function Get-GitHubChangeLog {
 		$Response.Resources.search.remaining
 	}
 
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 	$ChangeLog = @()
 	$Commits = git log $CommitRange --pretty="%H"
 	$Commits |
