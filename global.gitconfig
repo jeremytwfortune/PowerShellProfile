@@ -1,0 +1,24 @@
+[user]
+  name = Jeremy Fortune
+  email = jeremy@careevolution.com
+  signingkey = 35E40FA7
+[http]
+  sslcainfo = C:\\Program Files\\Git\\mingw64\\ssl\\certs\\ca-bundle.crt
+[core]
+  autocrlf = true
+  editor = "atom --wait"
+  ignorecase = true
+[alias]
+  compare-log = log --oneline --left-right --name-only --no-merges
+  author-log = log --pretty=format:\"%C(yellow)%h %C(black)%G? %<(12,trunc)%C(cyan)%an %<(12,trunc)%C(green)%ar%>(1)%C(auto)%d%Creset%s\" --no-merges
+  vsclean = clean -xdf -e packages -e .vs -e node_modules
+[push]
+  default = simple
+[credential]
+  helper = store
+[commit]
+  gpgsign = true
+[hub]
+  protocol = https
+[gpg]
+  program = C:\\Program Files (x86)\\GnuPG\\bin\\gpg.exe

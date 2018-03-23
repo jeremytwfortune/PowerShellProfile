@@ -4,6 +4,8 @@ Set-PSReadlineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 
 Import-Module CredentialManager
 
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+
 $Work = "$Home\Work"
 $Desk = "$Home\Desktop"
 $Repos = "$Home\Repos"
