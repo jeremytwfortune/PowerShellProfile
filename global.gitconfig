@@ -6,7 +6,7 @@
   sslcainfo = C:\\Program Files\\Git\\mingw64\\ssl\\certs\\ca-bundle.crt
 [core]
   autocrlf = true
-  editor = "atom --wait"
+  editor = "vim"
   ignorecase = true
 [alias]
   compare-log = log --oneline --left-right --name-only --no-merges
