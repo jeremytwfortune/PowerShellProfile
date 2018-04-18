@@ -1,3 +1,3 @@
-~LButton & RButton::Send #{Tab}
-LButton & WheelDown::Send ^#{Right}
-LButton & WheelUp::Send ^#{Left}
+~LButton & MButton::Send #{Tab}
+~MButton & WheelDown::Send ^#{Right}
+MButton & WheelUp::Send ^#{Left}
