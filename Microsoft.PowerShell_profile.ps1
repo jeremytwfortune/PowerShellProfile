@@ -19,18 +19,6 @@ Get-ChildItem "$(Split-Path $PROFILE)\Functions" |
 		. $_.FullName
 	}
 
-$Env:PERSONALLOG_AWSREGION = "us-east-1"
-$Env:PERSONALLOG_TABLENAME = "PersonalLog"
-$Env:PERSONALLOG_TIMEINDEX = "Time-index"
-$Env:PERSONALLOG_CACHEDIRECTORY = "$Home\.PersonalLogCache"
-$Env:PERSONALLOG_DEFAULTTAGS = "Personal"
-$Env:PERSONALLOG_LOCATION = "Home $Env:COMPUTERNAME"
-if ( ! ( Test-Path $Env:PERSONALLOG_CACHEDIRECTORY ) ) {
-	New-Item -Type Directory $Env:PERSONALLOG_CACHEDIRECTORY
-}
-Import-Module $Repos\PersonalLog\PersonalLog.psm1
-Set-Alias l Write-PersonalLog
-
 $Global:CredentialStore = @{ Tokens = @{} }
 if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "api.github.com/oauth" ) {
 	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential.GetNetworkCredential().Password
