@@ -6,7 +6,7 @@ choco install -y `
 	7zip `
 	notepadplusplus `
 	atom `
-	chrome `
+	googlechrome `
 	git `
 	ag `
 	gpg4win `
