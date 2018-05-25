@@ -36,5 +36,5 @@ if ( $Work ) {
 }
 
 
-Install-Module PSReadLine
-Install-Module CredentialManager
+Install-Module -Name PSReadLine -Force
+Install-Module -Name CredentialManager -Force
