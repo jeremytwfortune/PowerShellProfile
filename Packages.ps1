@@ -18,7 +18,8 @@ choco install -y `
 	dashlane `
 	office365proplus `
 	vim `
-	autohotkey
+	autohotkey `
+	f.lux.install
 
 if ( $Work ) {
 	choco install -y `
@@ -30,11 +31,25 @@ if ( $Work ) {
 		rdcman `
 		r.studio `
 		slack `
-		citrix-receiver
+		citrix-receiver `
+		nuget.commandline
 
+	choco install -y nodejs --version 9.5.0
 	# CE rdcman rdg file available in CE Google Drive
-}
 
+	Start-Process "https://www.microsoft.com/en-us/sql-server/sql-server-downloads"
+
+	"IIS-ASPNET45",
+	"Windows-Identity-Foundation",
+	"WCF-HTTP-Activation",
+	"WCF-HTTP-Activation45",
+	"IIS-ManagementScriptingTools",
+	"MSMQ-Server",
+	"MSMQ-ADIntegration",
+	"MSMQ-HTTP" | ForEach-Object {
+		Enable-WindowsOptionalFeature -Online -FeatureName $_ -All
+	}
+}
 
 Install-Module -Name PSReadLine -Force
 Install-Module -Name CredentialManager -Force
