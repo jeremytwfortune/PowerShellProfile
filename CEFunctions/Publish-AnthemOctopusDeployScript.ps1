@@ -32,7 +32,9 @@ function Publish-AnthemOctopusDeployScript {
 		[ValidateNotNullOrEmpty()]
 		[String] $FtpServer = "ftp://download.careevolution.com",
 
-		[Switch] $KeepFiles
+		[Switch] $KeepFiles,
+
+		[Switch] $NoUpload
 	)
 
 	function Remove-AnthemOctopusDeployScript {
@@ -186,10 +188,12 @@ function Publish-AnthemOctopusDeployScript {
 				-UsePassive
 		} -ErrorAction Stop
 		Compress-OctopusDeployScript -Session $Session -EnvironmentName $environmentName
-		Send-OctopusDeployScript `
-			-Session $session `
-			-EnvironmentName $environmentName `
-			-RemoteDirectory $RemoteDirectory
+		if ( ! ( $NoUpload ) ) {
+			 Send-OctopusDeployScript `
+				-Session $session `
+				-EnvironmentName $environmentName `
+				-RemoteDirectory $RemoteDirectory
+		}
 	} catch {
 		throw
 	}
