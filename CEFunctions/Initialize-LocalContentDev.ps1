@@ -8,7 +8,6 @@ function Initialize-LocalContentDev {
 
   if ( -Not ( Test-Path $NaryaRepoLocation ) -Or -Not ( Test-Path $GalileoRepoLocation ) ) {
     Write-Error 'Both repo locations must be set. Consider passing parameters or setting $Env:NARYA_REPO and $Env:GALILEO_REPO.'
-    exit 1
   }
 
   if ( -Not $SkipNarya ) {
@@ -32,7 +31,7 @@ function Initialize-LocalContentDev {
     $webConfig.save( "$GalileoRepoLocation\Galileo\web.config" )
 
     $galileoConnectionStrings = "$Home\Galileo.ConnectionStrings.config"
-    if ( ! ( Test-Path $galileoConnectionStrings ) ) {
+    if ( Test-Path $galileoConnectionStrings ) {
       Write-Verbose "Copying $galileoConnectionStrings to Galileo repository"
       Copy-Item -Force $galileoConnectionStrings $GalileoRepoLocation\Galileo\ConnectionStrings.config.default
     }
