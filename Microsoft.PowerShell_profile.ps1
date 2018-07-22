@@ -34,6 +34,8 @@ if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction Silent
 Set-Alias npp "C:\Program Files (x86)\Notepad++\notepad++.exe"
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
 
+Import-Module posh-git -Force
+
 . "$(Split-Path $PROFILE)\prompt.ps1"
 cd $Home
 
