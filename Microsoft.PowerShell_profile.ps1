@@ -23,10 +23,6 @@ $Global:CredentialStore = @{ Tokens = @{} }
 if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "api.github.com/oauth" ) {
 	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential.GetNetworkCredential().Password
 }
-if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "console.aws.amazon.com/personallog" ) {
-	$Env:PERSONALLOG_AWSACCESSKEY = $oAuthCredential.GetNetworkCredential().UserName
-	$Env:PERSONALLOG_AWSSECRETKEY = $oAuthCredential.GetNetworkCredential().Password
-}
 
 Set-Alias npp "C:\Program Files (x86)\Notepad++\notepad++.exe"
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
