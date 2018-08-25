@@ -1,25 +1,13 @@
 function Start-RdpSession {
 	[CmdletBinding()] param (
-		[Parameter(
-			Mandatory,
-			ParameterSetName = "Name" )]
-		[String[]] $ComputerName,
-
-		[Parameter(
-			Mandatory,
-			ParameterSetName = "Session" )]
+		[Parameter( Mandatory )]
 		[System.Management.Automation.Runspaces.PSSession[]] $Session,
 
-		[Parameter(
-			Mandatory )]
+		[Parameter( Mandatory )]
 		[PSCredential] $Credential
 	)
 
-	if ( $PSCmdlet.ParameterSetName -Eq "Name" ) {
-		$Targets = $ComputerName
-	} else {
-		$Targets = ( $Session ).ComputerName
-	}
+	$Targets = ( $Session ).ComputerName
 
 	if ( ! $Targets ) {
 		throw "Target list is empty."
