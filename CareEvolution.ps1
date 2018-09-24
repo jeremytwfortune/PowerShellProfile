@@ -15,8 +15,9 @@ if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction Silent
 if ( $progetCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "proget.careevolution.com" ) {
 	$Global:CredentialStore.Tokens.Proget = $progetCredential.GetNetworkCredential().Password
 }
-$Global:CredentialStore.Ce = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "download.careevolution.com"
+$Global:CredentialStore.CeDownloader = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "download.careevolution.com"
 $Global:CredentialStore.CeCorp = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com"
+$Global:CredentialStore.Ce = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com/nocorp"
 $Global:CredentialStore.Trinity = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "devidp.trinity-health.org"
 
 $Env:B3POSH_URL = "https://b3.careevolution.com"
