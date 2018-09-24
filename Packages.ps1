@@ -19,7 +19,8 @@ choco install -y `
 	office365proplus `
 	vim `
 	autohotkey `
-	f.lux.install
+	f.lux.install `
+	rainmeter
 
 if ( $Work ) {
 	choco install -y `
