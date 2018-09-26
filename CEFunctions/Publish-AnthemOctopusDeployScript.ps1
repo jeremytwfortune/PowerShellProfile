@@ -1,7 +1,6 @@
 #Require -Version 5.1
 
 Import-Module Octoposh
-Import-Module PSFTP
 
 function Publish-AnthemOctopusDeployScript {
 	[CmdletBinding()] param (
@@ -21,7 +20,7 @@ function Publish-AnthemOctopusDeployScript {
 		[String] $Environment = $Tenant,
 
 		[ValidateNotNullOrEmpty()]
-		[String] $RemoteDirectory = "/Temp/Jeremy",
+		[String] $RemoteDirectory = "CareEvolution\Temp\Jeremy",
 
 		[ValidateNotNullOrEmpty()]
 		[String] $OctopusApiKey = $Global:CredentialStore.Tokens.OctopusApiKey,
@@ -29,10 +28,9 @@ function Publish-AnthemOctopusDeployScript {
 		[ValidateNotNullOrEmpty()]
 		[PSCredential] $Credential = $Global:CredentialStore.CeCorp,
 
-		[ValidateNotNullOrEmpty()]
-		[String] $FtpServer = "ftp://download.careevolution.com",
-
 		[Switch] $KeepFiles,
+
+		[Switch] $NoDeploy,
 
 		[Switch] $NoUpload
 	)
@@ -129,6 +127,7 @@ function Publish-AnthemOctopusDeployScript {
 			$Session,
 			$EnvironmentName,
 			$RemoteDirectory,
+			$Credential,
 			$DeploymentRoot = "C:\OfflineDeploy"
 		)
 		Write-Verbose "Uploading files"
@@ -136,28 +135,25 @@ function Publish-AnthemOctopusDeployScript {
 			-ArgumentList `
 				$DeploymentRoot, `
 				$EnvironmentName, `
-				$RemoteDirectory `
+				$RemoteDirectory, `
+				$Credential `
 			-ScriptBlock {
 			param (
 				$DeploymentRoot,
 				$EnvironmentName,
-				$RemoteDirectory
+				$RemoteDirectory,
+				$Credential
 			)
 			if ( ! ( $deploymentDirectory = Get-Item "$DeploymentRoot\$EnvironmentName" ) ) {
 				throw "Unable to find deployment directory"
 			}
 			$localZips = Get-ChildItem -Path "$deploymentDirectory\*.zip" -File
-			Get-FtpChildItem -Path "$RemoteDirectory" | %{
-				if ( $localZips.Name -Contains $_.Name ) {
-					Remove-FtpItem "$($_.FullName)"
-				}
+			if ( -Not ( Get-PSDrive "DevOps" -ErrorAction SilentlyContinue ) ) {
+				New-PSDrive -Name "DevOps" -PSProvider FileSystem -Root "\\devopsserver\d$" -Credential $Credential
 			}
-			Set-Location $deploymentDirectory # Send-FtpItem is bad with absolute local paths.
-			$localZips | %{
-				Send-FtpItem -Path $RemoteDirectory -LocalPath "$($_.Name)"
-			}
+			Copy-Item -Path $localZips -Destination "DevOps:\$RemoteDirectory"
 		}
-		Write-Verbose "Files uploaded"
+ 		Write-Verbose "Files uploaded"
 	}
 
 	$environmentName = "Anthem $Environment"
@@ -169,30 +165,24 @@ function Publish-AnthemOctopusDeployScript {
 	}
 
 	try {
-		if ( ! $KeepFiles ) {
+		if ( -Not $KeepFiles ) {
 			Remove-AnthemOctopusDeployScript -Session $Session -EnvironmentName $environmentName
 		}
-		Invoke-OctopusDeploy `
-			-EnvironmentName $environmentName `
-			-TenantName $tenantName `
-			-OctopusApiKey $OctopusApiKey `
-			-ReleaseVersion $Version `
-			-ProjectName $projectName
-		Invoke-Command -Session $Session -ArgumentList $Credential, $FtpServer -ScriptBlock {
-			param( $Credential, $Server )
-			Set-FTPConnection `
-				-Server $Server `
-				-Credentials $Credential `
-				-EnableSsl `
-				-IgnoreCert `
-				-UsePassive
-		} -ErrorAction Stop
-		Compress-OctopusDeployScript -Session $Session -EnvironmentName $environmentName
-		if ( ! ( $NoUpload ) ) {
+		if ( -Not $NoDeploy ) {
+			Invoke-OctopusDeploy `
+				-EnvironmentName $environmentName `
+				-TenantName $tenantName `
+				-OctopusApiKey $OctopusApiKey `
+				-ReleaseVersion $Version `
+				-ProjectName $projectName
+			Compress-OctopusDeployScript -Session $Session -EnvironmentName $environmentName
+		}
+		if ( -Not $NoUpload ) {
 			 Send-OctopusDeployScript `
 				-Session $session `
 				-EnvironmentName $environmentName `
-				-RemoteDirectory $RemoteDirectory
+				-RemoteDirectory $RemoteDirectory `
+				-Credential $Credential
 		}
 	} catch {
 		throw
