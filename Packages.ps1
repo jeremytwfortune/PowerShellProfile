@@ -20,7 +20,11 @@ choco install -y `
 	vim `
 	autohotkey `
 	f.lux.install `
-	rainmeter
+	rainmeter `
+	vscode
+
+refreshenv
+code --install-extension Shan.code-settings-sync
 
 if ( $Work ) {
 	choco install -y `
