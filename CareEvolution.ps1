@@ -1,6 +1,6 @@
 # Galileo parameters to simulate OD
 
-$Env:GALILEO_REPO = "C:\Users\Jeremy\Repos\Galileo_Content"
+$Env:GALILEO_REPO = "C:\Users\Jeremy\Repos\Galileo"
 $Env:NARYA_REPO = "C:\Users\Jeremy\Repos\narya"
 
 Import-Module CE-PSModule -WarningAction SilentlyContinue
