@@ -1,24 +1,46 @@
 function Start-RdpSession {
-	[CmdletBinding()] param (
-		[Parameter( Mandatory )]
-		[ValidateNotNullOrEmpty()]
-		[System.Management.Automation.Runspaces.PSSession[]] $Session,
+		[CmdletBinding()] param (
+				[Parameter(
+						Mandatory,
+						Position = 1,
+						ValueFromPipeline
+				)]
+				[ValidateNotNullOrEmpty()]
+				[System.Management.Automation.Runspaces.PSSession[]] $Session,
 
-		[PSCredential] $Credential
-	)
+				[PSCredential] $Credential
+		)
 
-	$Targets = @( $Session ) | %{
-		@{
-			ComputerName = $_.ComputerName
-			Credential = if ( $Credential ) { $Credential } else { $_.Runspace.ConnectionInfo.Credential }
+		begin {
+				function Start-SingleSession {
+						param(
+								[System.Management.Automation.Runspaces.PSSession[]] $SingleSession,
+								[PSCredential] $SingleCredential
+						)
+						$computerName = $SingleSession.ComputerName
+						$cred = if ( $SingleCredential ) { $SingleCredential } else { $SingleSession.Runspace.ConnectionInfo.Credential }
+						if ( ( -Not $computerName ) -Or ( -Not $cred ) ) {
+								throw "Unable to determine ComputerName or Credential from Session"
+						}
+
+						Write-Verbose "Setting credential for $computerName"
+						$pass = $cred.GetNetworkCredential().Password -Replace "'", "''"
+						Invoke-Expression "cmdkey /generic:TERMSRV/$computerName /user:$($cred.UserName) /pass:'$pass'" 1>$Null
+
+						Write-Verbose "Starting connection for $computerName"
+						Invoke-Expression "mstsc /v:$computerName"
+				}
+
+				$fromPipeline = -Not $PSBoundParameters.ContainsKey( "Session" )
 		}
-	}
-	$Targets | %{
-		Write-Verbose "Setting credential for $_"
-		$pass = $_.Credential.GetNetworkCredential().Password -Replace "'", "''"
-		Invoke-Expression "cmdkey /generic:TERMSRV/$($_.ComputerName) /user:$($_.Credential.UserName) /pass:'$pass'" 1>$Null
-
-		Write-Verbose "Starting connection for $($_.ComputerName)"
-		Invoke-Expression "mstsc /v:$($_.ComputerName)"
-	}
+		process {
+				if ( $fromPipeline ) {
+						Start-SingleSession -SingleSession $_ -SingleCredential $Credential
+				} else {
+						$Session | %{
+								Start-SingleSession -SingleSession $_ -SingleCredential $Credential
+						}
+				}
+		}
+		end {}
 }
