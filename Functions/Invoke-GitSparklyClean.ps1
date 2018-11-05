@@ -1,7 +1,8 @@
 function Invoke-GitSparklyClean {
 	[CmdletBinding()] param(
 		[String[]] $Excludes,
-		[Switch] $DryRun
+		[Switch] $DryRun,
+		[Switch] $Reset
 	)
 	$count = 0
 	$results = @( "default" )
@@ -35,5 +36,10 @@ function Invoke-GitSparklyClean {
 		}
 
 		$count++
+	}
+
+	if ( $Reset ) {
+		Invoke-Expression "git checkout -- ."
+		Invoke-Expression "git reset --hard"
 	}
 }
