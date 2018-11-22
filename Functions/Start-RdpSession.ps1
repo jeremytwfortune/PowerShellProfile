@@ -1,23 +1,46 @@
 function Start-RdpSession {
-	[CmdletBinding()] param (
-		[Parameter( Mandatory )]
-		[System.Management.Automation.Runspaces.PSSession[]] $Session,
+		[CmdletBinding()] param (
+				[Parameter(
+						Mandatory,
+						Position = 1,
+						ValueFromPipeline
+				)]
+				[ValidateNotNullOrEmpty()]
+				[System.Management.Automation.Runspaces.PSSession[]] $Session,
 
-		[Parameter( Mandatory )]
-		[PSCredential] $Credential
-	)
+				[PSCredential] $Credential
+		)
 
-	$Targets = ( $Session ).ComputerName
+		begin {
+				function Start-SingleSession {
+						param(
+								[System.Management.Automation.Runspaces.PSSession[]] $SingleSession,
+								[PSCredential] $SingleCredential
+						)
+						$computerName = $SingleSession.ComputerName
+						$cred = if ( $SingleCredential ) { $SingleCredential } else { $SingleSession.Runspace.ConnectionInfo.Credential }
+						if ( ( -Not $computerName ) -Or ( -Not $cred ) ) {
+								throw "Unable to determine ComputerName or Credential from Session"
+						}
 
-	if ( ! $Targets ) {
-		throw "Target list is empty."
-	}
-	$Targets | %{
-		Write-Verbose "Setting credential for $_"
-		$pass = $Credential.GetNetworkCredential().Password -Replace "'", "''"
-		Invoke-Expression "cmdkey /generic:TERMSRV/$_ /user:$($Credential.UserName) /pass:'$pass'" 1>$Null
+						Write-Verbose "Setting credential for $computerName"
+						$pass = $cred.GetNetworkCredential().Password -Replace "'", "''"
+						Invoke-Expression "cmdkey /generic:TERMSRV/$computerName /user:$($cred.UserName) /pass:'$pass'" 1>$Null
 
-		Write-Verbose "Starting connection for $_"
-		Invoke-Expression "mstsc /v:$_"
-	}
+						Write-Verbose "Starting connection for $computerName"
+						Invoke-Expression "mstsc /v:$computerName"
+				}
+
+				$fromPipeline = -Not $PSBoundParameters.ContainsKey( "Session" )
+		}
+		process {
+				if ( $fromPipeline ) {
+						Start-SingleSession -SingleSession $_ -SingleCredential $Credential
+				} else {
+						$Session | %{
+								Start-SingleSession -SingleSession $_ -SingleCredential $Credential
+						}
+				}
+		}
+		end {}
 }
