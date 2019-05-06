@@ -28,16 +28,14 @@ code --install-extension Shan.code-settings-sync
 
 if ( $Work ) {
 	choco install -y `
-		visualstudio2017enterprise `
-		dbeaver `
+		visualstudio2019enterprise `
 		sql-server-management-studio `
-		jetbrains-rider `
-		filezilla `
 		rdcman `
 		r.studio `
 		slack `
 		citrix-receiver `
-		nuget.commandline
+		nuget.commandline `
+		fork
 
 	choco install -y nodejs --version 9.5.0
 	# CE rdcman rdg file available in CE Google Drive
