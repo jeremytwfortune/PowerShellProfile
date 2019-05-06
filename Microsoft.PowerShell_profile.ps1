@@ -9,9 +9,9 @@ Import-Module CredentialManager
 $Work = "$Home\Work"
 $Desk = "$Home\Desktop"
 $Repos = "$Home\Repos"
-$Drive = "G:\My Drive"
+$Drive = "$Home\Google Drive"
+$Ssms = "C:\Program Files (x86)\Microsoft SQL Server\130\Tools\Binn\ManagementStudio\Ssms.exe"
 
-$Env:Path = "$Env:Path;$Home\Documents\WindowsPowerShell\Scripts"
 $Env:Path = "$Env:Path;C:\Program Files\Git\usr\bin"
 
 Get-ChildItem "$(Split-Path $PROFILE)\Functions" |
@@ -23,8 +23,6 @@ $Global:CredentialStore = @{ Tokens = @{} }
 if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "api.github.com/oauth" ) {
 	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential.GetNetworkCredential().Password
 }
-
-. "$(Split-Path $PROFILE)\CareEvolution.ps1"
 
 Set-Alias npp "C:\Program Files (x86)\Notepad++\notepad++.exe"
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
