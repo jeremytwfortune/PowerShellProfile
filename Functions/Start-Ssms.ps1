@@ -7,6 +7,6 @@ function Start-Ssms {
 	if ( $Credential ) {
 		Invoke-Expression "runas /netonly /user:$($Credential.Username) ""$ssms"""
 	} else {
-		Invoke-Expression """$ssms"""
+		Invoke-Expression "& ""$ssms"""
 	}
 }

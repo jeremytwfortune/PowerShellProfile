@@ -1,0 +1,13 @@
+Chrome =
+LiceCap =
+ConEmu =
+Slack =
+VsCode = code
+VisualStudio =
+CiscoAnyConnect =
+Dashlane =
+SqlServerManagementStudio = Start-Ssms
+Ssms = Start-Program SqlServerManagementStudio
+RdcMan =
+Fork =
+LogitechGaming =
