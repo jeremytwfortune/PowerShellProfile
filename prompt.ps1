@@ -18,6 +18,13 @@ function prompt {
 		}
 	}
 
+	function Get-StatusColor {
+		$status = @(git status --porcelain)
+		if ( $status.Count -eq 0 ) { return [System.ConsoleColor]::DarkGreen }
+		if ( $status -cmatch "^.[^\s]" ) { return [System.ConsoleColor]::DarkMagenta }
+		[System.ConsoleColor]::DarkYellow
+	}
+
 	if ( ! $Global:DirectoryHistory ) {
 		$Global:DirectoryHistory = @()
 	}
@@ -25,20 +32,18 @@ function prompt {
 		$Global:DirectoryHistory += ( Get-Location )
 	}
 
-	Write-Host ""
-
-	Write-Host "$Env:USERNAME@$Env:USERDOMAIN " -NoNewline -ForegroundColor Magenta
+	Write-Host
 	Write-Host "$(Get-ShortPath -Path (Get-Location)) " -NoNewline -ForegroundColor Cyan
 
 	try {
 		$insideRepo = git rev-parse --is-inside-work-tree
-		if ( ! ( $headReference = git symbolic-ref --short HEAD 2>$Null ) ) {
+		if ( -Not ( $headReference = git symbolic-ref --short HEAD 2>$Null ) ) {
 			$headReference = (git rev-parse HEAD 2>$Null).Substring(0, 8)
 		}
-		Write-Host $headReference -NoNewline -ForegroundColor DarkGreen
+		Write-Host $headReference -NoNewline -ForegroundColor (Get-StatusColor)
 	} catch {}
 
-	Write-Host ""
+	Write-Host
 	Write-Host ">" -NoNewline
 	return " "
 }
