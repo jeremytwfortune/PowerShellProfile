@@ -1,3 +1,5 @@
+#Requires -Modules AWSPowerShell
+
 # Galileo parameters to simulate OD
 
 $Env:GALILEO_REPO = "C:\Users\Jeremy\Repos\Galileo"
@@ -15,6 +17,11 @@ if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction Silent
 if ( $progetCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "proget.careevolution.com" ) {
 	$Global:CredentialStore.Tokens.Proget = $progetCredential.GetNetworkCredential().Password
 }
+if ( $awsCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "aws.amazon.com/iam" ) {
+	Set-AWSCredential -AccessKey $awsCredential.UserName -SecretKey $awsCredential.GetNetworkCredential().Password
+	$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
+	$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
+}
 $Global:CredentialStore.CeDownloader = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "download.careevolution.com"
 $Global:CredentialStore.CeCorp = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com"
 $Global:CredentialStore.Ce = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com/nocorp"
@@ -29,9 +36,6 @@ if ( Test-Path $Home\CeServers.json ){
   $Global:CeServers = Get-Content $Home\CeServers.json | ConvertFrom-Json
 }
 
-Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" |
-	%{
-		. $_.FullName
-	}
-
-function Copy-CeCorpPasswordToClipboard { $Global:CredentialStore.CeCorp.GetNetworkCredential().Password | Set-Clipboard }; Set-Alias pw Copy-CeCorpPasswordToClipboard
+Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | %{
+	. $_.FullName
+}
