@@ -11,6 +11,9 @@ function Set-AwsDefaultSession {
 		[string] $SerialNumber = "arn:aws:iam::174627156110:mfa/jeremy",
 
 		[Parameter()]
+		[System.Management.Automation.Runspaces.PSSession] $Session,
+
+		[Parameter()]
 		[switch] $PassThru
 	)
 
@@ -19,6 +22,17 @@ function Set-AwsDefaultSession {
 	[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", $token.AccessKeyId, $Environment)
 	[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", $token.SecretAccessKey, $Environment)
 	[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", $token.SessionToken, $Environment)
+
+	if ($Session) {
+		Invoke-Command `
+			-Session $Session `
+			-ArgumentList $token, $Environment `
+			-ScriptBlock {
+				[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", $token.AccessKeyId, $Environment)
+				[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", $token.SecretAccessKey, $Environment)
+				[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", $token.SessionToken, $Environment)
+			}
+	}
 
 	if ($PassThru) {
 		$token
