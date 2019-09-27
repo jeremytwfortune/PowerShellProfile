@@ -5,23 +5,20 @@
 $Env:GALILEO_REPO = "C:\Users\Jeremy\Repos\Galileo"
 $Env:NARYA_REPO = "C:\Users\Jeremy\Repos\narya"
 
-Import-Module CE-PSModule -WarningAction SilentlyContinue
-Import-Module Galileo.Cli
-
-Set-CEEnv "C:\Users\Jeremy\Repos\Consumers\Deployments\WebClientTest.xml" -WarningAction SilentlyContinue
-$Env:Path = "$Env:Path;$Repos\narya-tools\Packomatic\ntools\bin\Debug"
-
 if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "api.octopus.careevolution.com" ) {
 	$Global:CredentialStore.Tokens.OctopusApiKey = $oAuthCredential.GetNetworkCredential().Password
 }
+
 if ( $progetCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "proget.careevolution.com" ) {
 	$Global:CredentialStore.Tokens.Proget = $progetCredential.GetNetworkCredential().Password
 }
+
 if ( $awsCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "aws.amazon.com/iam" ) {
 	Set-AWSCredential -AccessKey $awsCredential.UserName -SecretKey $awsCredential.GetNetworkCredential().Password
 	$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
 	$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
 }
+
 $Global:CredentialStore.CeDownloader = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "download.careevolution.com"
 $Global:CredentialStore.CeCorp = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com"
 $Global:CredentialStore.Ce = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com/nocorp"
