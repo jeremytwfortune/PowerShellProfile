@@ -59,6 +59,7 @@ function Get-GitHubChangeLog {
 				"Number" = $Commit
 				"Tags" = @("Commit")
 				"Body" = $Body
+				"Link" = "https://github.com/$RepositoryOwner/$RepositoryName/commit/$Commit"
 			}
 		} else {
 			$Response.items | % {
@@ -73,6 +74,7 @@ function Get-GitHubChangeLog {
 					"Number" = $_.number
 					"Tags" = $Tags
 					"Body" = $_.body
+					"Link" = "https://github.com/$RepositoryOwner/$RepositoryName/pull/$($_.number)"
 				}
 			}
 		}

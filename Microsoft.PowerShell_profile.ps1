@@ -35,4 +35,3 @@ if (Test-Path($ChocolateyProfile)) {
 
 . "$(Split-Path $PROFILE)\prompt.ps1"
 Set-Location $Home
-Clear-Host
