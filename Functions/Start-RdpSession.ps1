@@ -24,8 +24,7 @@ function Start-RdpSession {
 						}
 
 						Write-Verbose "Setting credential for $computerName"
-						$pass = $cred.GetNetworkCredential().Password -Replace "'", "''"
-						Invoke-Expression "cmdkey /generic:TERMSRV/$computerName /user:$($cred.UserName) /pass:'$pass'" 1>$Null
+						New-StoredCredential -Type Generic -Target "TERMSRV/$computerName" -Credentials $cred | Out-Null
 
 						Write-Verbose "Starting connection for $computerName"
 						Invoke-Expression "mstsc /v:$computerName"

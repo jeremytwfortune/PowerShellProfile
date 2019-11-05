@@ -15,7 +15,7 @@ function Invoke-GitSparklyClean {
 			$excludeCommand = "$excludeCommand -e $exclude"
 		}
 	}
-	$defaultExclude = "-e .idea"
+	$defaultExclude = "-e .idea -e .vs"
 
 	$command = "git clean -xdf $defaultExclude $excludeCommand $dryRunFlag"
 	Write-Verbose "Executing '$command'"
