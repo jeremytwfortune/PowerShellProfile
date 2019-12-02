@@ -11,18 +11,21 @@
 [alias]
   compare-log = log --oneline --left-right --name-only --no-merges
   author-log = log --pretty=format:\"%C(yellow)%h %C(black)%G? %<(12,trunc)%C(cyan)%an %<(12,trunc)%C(green)%ar%>(1)%C(auto)%d%Creset%s\" --no-merges
-  vsclean = clean -xdf -e packages -e .vs -e node_modules
   can = commit --amend --no-edit
   ca = commit --amend
+  pushu = "!git push -u origin \"$(git rev-parse --abbrev-ref HEAD)\""
 [push]
   default = simple
 [credential]
   helper = store
 [commit]
   gpgsign = true
-[hub]
-  protocol = https
 [gpg]
   program = C:\\Program Files (x86)\\GnuPG\\bin\\gpg.exe
 [diff]
   tool = "vim -d"
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
