@@ -21,6 +21,7 @@ if ( $awsCredential = Get-StoredCredential -Type Generic -WarningAction Silently
 
 $Global:CredentialStore.CeDownloader = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "download.careevolution.com"
 $Global:CredentialStore.CeCorp = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com"
+$Global:CredentialStore.CePep = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "pep.careevolution.com"
 $Global:CredentialStore.Ce = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "adfs.careevolution.com/nocorp"
 $Global:CredentialStore.Trinity = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -Target "devidp.trinity-health.org"
 
