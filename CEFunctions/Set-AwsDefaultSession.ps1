@@ -1,48 +1,20 @@
 function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
-		[ValidateNotNullOrEmpty()]
-		[string] $TokenCode = (Read-Host "Token Code"),
-
-		[Parameter()]
-		[System.EnvironmentVariableTarget] $Environment = [System.EnvironmentVariableTarget]::Process,
-
-		[Parameter()]
-		[string] $SerialNumber = "arn:aws:iam::174627156110:mfa/jeremy",
-
-		[Parameter()]
-		[System.Management.Automation.Runspaces.PSSession] $Session,
-
-		[Parameter()]
-		[switch] $PassThru
+		[Parameter(Mandatory)]
+		[ValidateSet("Corp", "Pep")]
+		[string] $Environment
 	)
 
-	$token = Get-STSSessionToken -SerialNumber $SerialNumber -TokenCode $TokenCode
-
-	if ($Session) {
-		Write-Verbose "Writing to remote host $($Session.ComputerName)"
-		Invoke-Command `
-			-Session $Session `
-			-ArgumentList $token, $Environment `
-			-ScriptBlock {
-				param($Token, $Environment)
-				Write-Verbose "Setting AWS_ACCESS_KEY_ID to $($Token.AccessKeyId) for $Environment"
-				[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", $Token.AccessKeyId, $Environment)
-				Write-Verbose "Setting AWS_SECRET_ACCESS_KEY to $($Token.SecretAccessKey) for $Environment"
-				[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", $Token.SecretAccessKey, $Environment)
-				Write-Verbose "Setting AWS_SESSION_TOKEN to $($Token.SessionToken) for $Environment"
-				[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", $Token.SessionToken, $Environment)
-			}
-	} else {
-		Write-Verbose "Setting AWS_ACCESS_KEY_ID to $($Token.AccessKeyId) for $Environment"
-		[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", $Token.AccessKeyId, $Environment)
-		Write-Verbose "Setting AWS_SECRET_ACCESS_KEY to $($Token.SecretAccessKey) for $Environment"
-		[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", $Token.SecretAccessKey, $Environment)
-		Write-Verbose "Setting AWS_SESSION_TOKEN to $($Token.SessionToken) for $Environment"
-		[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", $Token.SessionToken, $Environment)
+	$target = "aws.amazon.com/iam/$($Environment.ToLower())"
+	if ( $awsCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target $target ) {
+		Set-AWSCredential -AccessKey $awsCredential.UserName -SecretKey $awsCredential.GetNetworkCredential().Password
+		$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
+		$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
 	}
 
-	if ($PassThru) {
-		$token
+	switch ($Environment) {
+		"Corp" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::174627156110:mfa/jeremy" }
+		"Pep" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::621233246578:mfa/jeremy.fortune" }
 	}
 }
