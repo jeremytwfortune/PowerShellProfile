@@ -13,6 +13,7 @@ if ( $progetCredential = Get-StoredCredential -Type Generic -WarningAction Silen
 	$Global:CredentialStore.Tokens.Proget = $progetCredential.GetNetworkCredential().Password
 }
 
+$global:StoredAWSRegion = 'us-east-1'
 if ( $awsCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "aws.amazon.com/iam/corp" ) {
 	Set-AWSCredential -AccessKey $awsCredential.UserName -SecretKey $awsCredential.GetNetworkCredential().Password
 	$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
