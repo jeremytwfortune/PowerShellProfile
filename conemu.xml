@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2019-12-20 08:57:43" build="180506">
+		<key name=".Vanilla" modified="2020-01-20 09:28:49" build="180506">
 			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>
 			<value name="StartTasksFile" type="string" data=""/>
-			<value name="StartTasksName" type="string" data="{Shells::Pwsh 7}"/>
+			<value name="StartTasksName" type="string" data="{Startup}"/>
 			<value name="StartFarFolders" type="hex" data="00"/>
 			<value name="StartFarEditors" type="hex" data="00"/>
 			<value name="StartCreateDelay" type="ulong" data="100"/>
@@ -150,11 +150,11 @@
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd X" type="long" data="971"/>
+			<value name="ConWnd X" type="long" data="979"/>
 			<value name="ConWnd Y" type="long" data="0"/>
 			<value name="LastMonitor" type="string" data="0,0,3840,1560"/>
-			<value name="ConWnd Width" type="dword" data="000000ed"/>
-			<value name="ConWnd Height" type="dword" data="0000003a"/>
+			<value name="ConWnd Width" type="dword" data="000000eb"/>
+			<value name="ConWnd Height" type="dword" data="00000039"/>
 			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="QuakeStyle" type="hex" data="01"/>
 			<value name="Restore2ActiveMon" type="hex" data="01"/>
@@ -596,43 +596,72 @@
 				<value name="Key.BufPrUp" type="dword" data="00121121"/>
 				<value name="Key.BufPrDn" type="dword" data="00121122"/>
 			</key>
-			<key name="Tasks" modified="2019-09-27 09:55:06" build="180506">
-				<value name="Count" type="long" data="4"/>
-				<key name="Task1" modified="2019-12-20 08:57:43" build="180506">
-					<value name="Name" type="string" data="{Shells::Pwsh 7}"/>
+			<key name="Tasks" modified="2020-01-20 09:28:49" build="180506">
+				<value name="Count" type="long" data="7"/>
+				<key name="Task1" modified="2020-01-20 09:28:49" build="180506">
+					<value name="Name" type="string" data="{Startup}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
-					<value name="Cmd1" type="string" data='"C:\Program Files\PowerShell\7-preview\pwsh.exe" -new_console:a'/>
+					<value name="Cmd1" type="string" data="&gt;pwsh -cur_console:a"/>
+					<value name="Active" type="long" data="1"/>
+					<value name="Count" type="long" data="3"/>
+					<value name="Cmd2" type="string" data="pwsh -cur_console:as1THn"/>
+					<value name="Cmd3" type="string" data="pwsh -cur_console:as2T30Vn"/>
+				</key>
+				<key name="Task2" modified="2020-01-20 09:28:49" build="180506">
+					<value name="Name" type="string" data="{Shells::Pwsh}"/>
+					<value name="Flags" type="dword" data="00000007"/>
+					<value name="Hotkey" type="dword" data="00000000"/>
+					<value name="GuiArgs" type="string" data=""/>
+					<value name="Cmd1" type="string" data="pwsh -new_console:a"/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task2" modified="2019-12-20 08:57:43" build="180506">
+				<key name="Task3" modified="2020-01-20 09:28:49" build="180506">
 					<value name="Name" type="string" data="{Bash::bash}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data='-icon "%USERPROFILE%\AppData\Local\lxss\bash.ico"'/>
-					<value name="Cmd1" type="string" data="%windir%\system32\bash.exe -cur_console:pm:/mnt"/>
+					<value name="Cmd1" type="string" data="bash -cur_console:pm:/mnt"/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task3" modified="2019-12-20 08:57:43" build="180506">
-					<value name="Name" type="string" data="{Shells::PowerShell (Admin)}"/>
+				<key name="Task4" modified="2020-01-20 09:28:49" build="180506">
+					<value name="Name" type="string" data="{Bash::bashHSplit}"/>
+					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Hotkey" type="dword" data="10115b45"/>
+					<value name="GuiArgs" type="string" data='-icon "%USERPROFILE%\AppData\Local\lxss\bash.ico"'/>
+					<value name="Cmd1" type="string" data="bash -cur_console:sHpm:/mnt"/>
+					<value name="Active" type="long" data="0"/>
+					<value name="Count" type="long" data="1"/>
+				</key>
+				<key name="Task5" modified="2020-01-20 09:28:49" build="180506">
+					<value name="Name" type="string" data="{Bash:bashVSplit}"/>
+					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Hotkey" type="dword" data="10115b4f"/>
+					<value name="GuiArgs" type="string" data='-icon "%USERPROFILE%\AppData\Local\lxss\bash.ico"'/>
+					<value name="Active" type="long" data="0"/>
+					<value name="Count" type="long" data="1"/>
+					<value name="Cmd1" type="string" data="bash -cur_console:sVpm:/mnt"/>
+				</key>
+				<key name="Task6" modified="2020-01-20 09:28:49" build="180506">
+					<value name="Name" type="string" data="{Shells::PowerShell}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
-					<value name="Cmd1" type="string" data="powershell.exe -new_console:a"/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
+					<value name="Cmd1" type="string" data="powershell.exe -new_console:a"/>
 				</key>
-				<key name="Task4" modified="2019-09-27 09:55:06" build="180506">
+				<key name="Task7" modified="2020-01-20 09:28:49" build="180506">
 					<value name="Name" type="string" data="{Shells::cmd (Admin)}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
-					<value name="Cmd1" type="string" data='cmd.exe /k "%ConEmuBaseDir%\CmdInit.cmd" -new_console:a'/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
+					<value name="Cmd1" type="string" data='cmd.exe /k "%ConEmuBaseDir%\CmdInit.cmd" -new_console:a'/>
 				</key>
 			</key>
 			<key name="Apps" modified="2018-05-08 07:39:39" build="161206">
@@ -1177,10 +1206,11 @@
 			<value name="DynamicBufferHeight" type="hex" data="01"/>
 			<value name="StatusBar.Hide.WMode" type="hex" data="01"/>
 			<value name="CmdLineHistory" type="multi">
-				<line data="{Shells::Pwsh 7}"/>
+				<line data="{Startup}"/>
 				<line data="{Bash::bash}"/>
-				<line data="{Shells::PowerShell (Split)}"/>
 				<line data="{Shells::PowerShell (Admin)}"/>
+				<line data="{Shells::Pwsh 7}"/>
+				<line data="{Shells::PowerShell (Split)}"/>
 				<line data="{Shells::cmd}"/>
 			</value>
 		</key>
