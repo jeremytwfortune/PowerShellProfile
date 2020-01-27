@@ -25,8 +25,6 @@ if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction Silent
 
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
 
-Import-Module posh-git -Force *>$Null
-
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
@@ -34,4 +32,5 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 . "$(Split-Path $PROFILE)\prompt.ps1"
+Import-Module ZLocation
 Set-Location $Home

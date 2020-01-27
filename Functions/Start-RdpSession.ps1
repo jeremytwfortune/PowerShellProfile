@@ -1,3 +1,5 @@
+#Requires -modules CredentialManager
+
 function Start-RdpSession {
 		[CmdletBinding()] param (
 				[Parameter(
