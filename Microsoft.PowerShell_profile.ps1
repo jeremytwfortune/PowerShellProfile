@@ -34,4 +34,5 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 . "$(Split-Path $PROFILE)\prompt.ps1"
+Import-Module ZLocation
 Set-Location $Home
