@@ -4,8 +4,6 @@ Set-ExecutionPolicy Bypass; iex ((New-Object System.Net.WebClient).DownloadStrin
 
 choco install -y `
 	7zip `
-	notepadplusplus `
-	atom `
 	googlechrome `
 	git `
 	ag `
@@ -37,7 +35,7 @@ if ( $Work ) {
 		nuget.commandline `
 		fork
 
-	choco install -y nodejs --version 9.5.0
+	choco install -y nodejs --version 10.7.0
 	# CE rdcman rdg file available in CE Google Drive
 
 	Start-Process "https://www.microsoft.com/en-us/sql-server/sql-server-downloads"
