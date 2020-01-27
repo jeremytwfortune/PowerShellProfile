@@ -49,4 +49,4 @@ function New-PSSessionCollection {
 	ConvertTo-PSSession -Configuration $Configuration -Credential $Credential
 }
 
-New-Alias -Name nsnc -Value New-PSSessionCollection
+Set-Alias -Name nsnc -Value New-PSSessionCollection
