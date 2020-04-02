@@ -1,47 +1,45 @@
-#Requires -modules CredentialManager
-
 function Start-RdpSession {
-		[CmdletBinding()] param (
-				[Parameter(
-						Mandatory,
-						Position = 1,
-						ValueFromPipeline
-				)]
-				[ValidateNotNullOrEmpty()]
-				[System.Management.Automation.Runspaces.PSSession[]] $Session,
+	[CmdletBinding()] param (
+		[Parameter(
+			Mandatory,
+			Position = 1,
+			ValueFromPipeline
+		)]
+		[ValidateNotNullOrEmpty()]
+		[System.Management.Automation.Runspaces.PSSession[]] $Session,
 
-				[PSCredential] $Credential
-		)
+		[PSCredential] $Credential
+	)
 
-		begin {
-				function Start-SingleSession {
-						param(
-								[System.Management.Automation.Runspaces.PSSession[]] $SingleSession,
-								[PSCredential] $SingleCredential
-						)
-						$computerName = $SingleSession.ComputerName
-						$cred = if ( $SingleCredential ) { $SingleCredential } else { $SingleSession.Runspace.ConnectionInfo.Credential }
-						if ( ( -Not $computerName ) -Or ( -Not $cred ) ) {
-								throw "Unable to determine ComputerName or Credential from Session"
-						}
+	begin {
+		function Start-SingleSession {
+			param(
+				[System.Management.Automation.Runspaces.PSSession] $SingleSession,
+				[PSCredential] $SingleCredential
+			)
+			$computerName = $SingleSession.ComputerName
+			$cred = $SingleCredential ?? $SingleSession.Runspace.ConnectionInfo.Credential
+			if ( ( -Not $computerName ) -Or ( -Not $cred ) ) {
+				throw "Unable to determine ComputerName or Credential from Session"
+			}
 
-						Write-Verbose "Setting credential for $computerName"
-						New-StoredCredential -Type Generic -Target "TERMSRV/$computerName" -Credentials $cred | Out-Null
+			Write-Verbose "Setting credential for $computerName"
+			Set-Secret -Name "TERMSRV/$computerName" -SecureStringSecret $cred.Password
 
-						Write-Verbose "Starting connection for $computerName"
-						Invoke-Expression "mstsc /v:$computerName"
-				}
-
-				$fromPipeline = -Not $PSBoundParameters.ContainsKey( "Session" )
+			Write-Verbose "Starting connection for $computerName"
+			Invoke-Expression "mstsc /v:$computerName"
+			# Invoke-Expression "cmdkey /delete:TERMSRV/$computerName"
 		}
-		process {
-				if ( $fromPipeline ) {
-						Start-SingleSession -SingleSession $_ -SingleCredential $Credential
-				} else {
-						$Session | %{
-								Start-SingleSession -SingleSession $_ -SingleCredential $Credential
-						}
-				}
+
+		$fromPipeline = -Not $PSBoundParameters.ContainsKey( "Session" )
+	}
+	process {
+		if ( $fromPipeline ) {
+			Start-SingleSession -SingleSession $_ -SingleCredential $Credential
+		} else {
+			$Session | %{
+				Start-SingleSession -SingleSession $_ -SingleCredential $Credential
+			}
 		}
-		end {}
+	}
 }
