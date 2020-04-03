@@ -1,5 +1,5 @@
 function Copy-CePepPasswordToClipboard {
-	$Global:CredentialStore.CePep.GetNetworkCredential().Password | Set-Clipboard
+	Get-Secret "Pep" | Set-Clipboard
 }
 
 Set-Alias ppw Copy-CePepPasswordToClipboard
