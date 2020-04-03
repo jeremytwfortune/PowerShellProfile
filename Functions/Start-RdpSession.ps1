@@ -24,11 +24,11 @@ function Start-RdpSession {
 			}
 
 			Write-Verbose "Setting credential for $computerName"
-			Set-Secret -Name "TERMSRV/$computerName" -SecureStringSecret $cred.Password
+			$plainText = $cred.GetNetworkCredential().Password
+			Invoke-Expression "cmdkey /generic:TERMSRV/$computerName /user:$($cred.UserName) --% /pass:$plainText"
 
 			Write-Verbose "Starting connection for $computerName"
 			Invoke-Expression "mstsc /v:$computerName"
-			# Invoke-Expression "cmdkey /delete:TERMSRV/$computerName"
 		}
 
 		$fromPipeline = -Not $PSBoundParameters.ContainsKey( "Session" )
