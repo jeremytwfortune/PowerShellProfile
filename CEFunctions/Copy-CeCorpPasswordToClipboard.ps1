@@ -1,5 +1,5 @@
 function Copy-CeCorpPasswordToClipboard {
-	$Global:CredentialStore.CeCorp.GetNetworkCredential().Password | Set-Clipboard
+	Get-Secret "Corp" | Set-Clipboard
 }
 
 Set-Alias pw Copy-CeCorpPasswordToClipboard

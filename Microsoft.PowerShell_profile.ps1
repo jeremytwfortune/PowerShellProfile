@@ -2,9 +2,7 @@ Set-PSReadlineOption -BellStyle None
 Set-PSReadlineKeyHandler -Key Tab -Functio Complete
 Set-PSReadlineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 
-Import-Module CredentialManager
-
-[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+[Net.ServicePointManager]::SecurityProtocol = "tls13, tls12"
 
 $Work = "$Home\Work"
 $Desk = "$Home\Desktop"
@@ -18,9 +16,10 @@ Get-ChildItem "$(Split-Path $PROFILE)\Functions" | %{
 	. $_.FullName
 }
 
+$Global:SecretKeys = @()
 $Global:CredentialStore = @{ Tokens = @{} }
-if ( $oAuthCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target "api.github.com/oauth" ) {
-	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential.GetNetworkCredential().Password
+if ( $oAuthCredential = Get-Secret -Name "api.github.com/oauth" ) {
+	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential
 }
 
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
@@ -32,5 +31,4 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 . "$(Split-Path $PROFILE)\prompt.ps1"
-Import-Module ZLocation
 Set-Location $Home
