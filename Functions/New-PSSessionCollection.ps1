@@ -16,30 +16,34 @@ function New-PSSessionCollection {
 			[Parameter(Mandatory)]
 			[PSCredential] $Credential,
 
-			[string] $Path
+			[string] $ParentPath
 		)
+
+		if ($Configuration -is [string]) {
+			if ($ParentPath) {
+				Write-Verbose "Creating session for $ParentPath"
+			} else {
+				Write-Verbose "Creating session at root"
+			}
+			return New-PSSession -ComputerName $Configuration -Credential $Credential
+		}
 
 		$sessions = @()
 		$notePropertyChildren = $Configuration |
 			Get-Member |
-			? MemberType -Eq "NoteProperty" |
-			Select-Object -ExpandProperty Name
-		foreach($notePropertyChild in $notePropertyChildren) {
+				? MemberType -Eq "NoteProperty" |
+				Select-Object -ExpandProperty Name
+		foreach ($notePropertyChild in $notePropertyChildren) {
 			if ($ParentPath) {
 				$path = "$ParentPath/"
 			}
 			$path += $notePropertyChild
 			$node = $Configuration.$notePropertyChild
-			if ($node -is [string] ) {
-				Write-Verbose "Creating session for $path"
-				$sessions += New-PSSession -ComputerName $node -Credential $Credential
-			} else {
-				Write-Verbose "Traversing down to $path"
-				$sessions += ConvertTo-PSSession `
-					-Configuration $node `
-					-Credential $Credential `
-					-Path $path
-			}
+			Write-Verbose "Traversing to $path"
+			$sessions += ConvertTo-PSSession `
+				-Configuration $node `
+				-Credential $Credential `
+				-ParentPath $path
 			$path = $null
 		}
 
