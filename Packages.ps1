@@ -19,6 +19,7 @@ choco install -y `
 	autohotkey `
 	f.lux.install `
 	rainmeter `
+	slack `
 	vscode
 
 refreshenv
@@ -30,10 +31,8 @@ if ( $Work ) {
 		sql-server-management-studio `
 		rdcman `
 		r.studio `
-		slack `
 		citrix-receiver `
-		nuget.commandline `
-		fork
+		nuget.commandline
 
 	choco install -y nodejs --version 10.7.0
 	# CE rdcman rdg file available in CE Google Drive
@@ -53,4 +52,3 @@ if ( $Work ) {
 }
 
 Install-Module -Name PSReadLine -Force
-Install-Module -Name CredentialManager -Force
