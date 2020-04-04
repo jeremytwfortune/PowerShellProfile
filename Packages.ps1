@@ -25,6 +25,9 @@ choco install -y `
 refreshenv
 code --install-extension Shan.code-settings-sync
 
+Copy-Item "$PSScriptRoot\wt-admin.lnk" $HOME
+Copy-Item "$PSScriptRoot\AutoHotKey.ahk" "$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
+
 if ( $Work ) {
 	choco install -y `
 		visualstudio2019enterprise `
