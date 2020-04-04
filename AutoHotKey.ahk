@@ -1,5 +1,11 @@
+#SingleInstance Force
 EnvGet, homePath, USERPROFILE
 wtPath := homePath . "\wt-admin"
+ahkScript := homePath . "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\AutoHotKey.ahk"
+winTerminal := "ahk_exe WindowsTerminal.exe"
+if !A_IsAdmin {
+	Run *Runas %ahkScript%
+}
 
 ~LButton & MButton::Send #{Tab}
 ~MButton & WheelDown::Send ^#{Right}
@@ -9,12 +15,12 @@ MButton & WheelUp::Send ^#{Left}
 #!=::Send {Volume_Up}
 
 ^`::
-if !WinExist("Windows Terminal") {
-	Run, %wtPath%
-}
-else if WinActive("Windows Terminal") {
-	WinMinimize
-}
-else if !WinActive("Windows Terminal") {
-	WinActivate
-}
+	if !WinExist(winTerminal) {
+		Run, %wtPath%
+	}
+	else if WinActive(winTerminal) {
+		WinMinimize, %winTerminal%
+	}
+	else if !WinActive(winTerminal) {
+		WinActivate, %winTerminal%
+	}
