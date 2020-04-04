@@ -9,7 +9,7 @@ Download fonts and install:
 - https://github.com/andreberg/Meslo-Font
 - https://github.com/belluzj/fantasque-sans
 
-Run
+### Packages
 
 ```powershell
 & .\Packages.ps1
@@ -17,8 +17,14 @@ Run
 
 Grab non-profile-directory configuration from [this gist](https://gist.github.com/jeremytwfortune/fe850de4eb384b2c78812bf2c0b97e64).
 
-Download Rainmeter skins
+### Rainmeter Skins
 
 - [Translucent Taskbar](https://www.deviantart.com/arkenthera/art/TranslucentTaskbar-1-2-656402039)
 
 Copy `.\Rainmeter` settings to `$Home\Documents\Rainmeter\Skins`.
+
+### Terminal
+
+- Install Windows Terminal from the Microsoft Store.
+- Ensure AutoHotKey is [installed with UI access](https://documentation.help/AutoHotKey-Functions/FAQ.htm#uac).
+- Copy profiles.json content
