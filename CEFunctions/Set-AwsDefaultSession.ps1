@@ -1,20 +1,48 @@
+#Requires -Modules AWS.Tools.SecurityToken
+
 function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory)]
 		[ValidateSet("Corp", "Pep")]
-		[string] $Environment
+		[string] $Environment,
+
+		[Parameter()]
+		[string] $TokenCode = (Read-Host "Token Code"),
+
+		[Parameter()]
+		[ValidateSet("Sandbox")]
+		[string] $RoleName
 	)
 
-	$target = "aws.amazon.com/iam/$($Environment.ToLower())"
-	if ( $awsCredential = Get-StoredCredential -Type Generic -WarningAction SilentlyContinue -Target $target ) {
-		Set-AWSCredential -AccessKey $awsCredential.UserName -SecretKey $awsCredential.GetNetworkCredential().Password
-		$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
-		$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
+	function Set-EnvironmentFromToken {
+		param($token)
+
+		$Env:AWS_ACCESS_KEY_ID = $token.AccessKeyId
+		$Env:AWS_SECRET_ACCESS_KEY = $token.SecretAccessKey
+		$Env:AWS_SESSION_TOKEN = $token.SessionToken
+		Set-AWSCredential `
+			-AccessKey $Env:AWS_ACCESS_KEY_ID `
+			-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
+			-SessionToken $Env:AWS_SESSION_TOKEN
 	}
 
-	switch ($Environment) {
-		"Corp" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::174627156110:mfa/jeremy" }
-		"Pep" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::621233246578:mfa/jeremy.fortune" }
+	& $PSScriptRoot\Clear-AwsDefaultSession $Environment
+
+	$stsSessionToken = Get-STSSessionToken -SerialNumber $Env:AWS_MFA_SERIAL -TokenCode $TokenCode
+	Set-EnvironmentFromToken $stsSessionToken
+
+	if (-Not $RoleName) { return }
+
+	switch ($RoleName) {
+		"Sandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
 	}
+
+	$stsRole = Use-STSRole `
+		-RoleArn $roleArn `
+		-AccessKey $Env:AWS_ACCESS_KEY_ID `
+		-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
+		-SessionToken $Env:AWS_SESSION_TOKEN `
+		-RoleSessionName "${RoleName}Session"
+	Set-EnvironmentFromToken $stsRole.Credentials
 }
