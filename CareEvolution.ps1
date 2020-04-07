@@ -1,4 +1,4 @@
-#Requires -Modules AWSPowerShell
+#Requires -Modules Aws.Tools.Common
 
 # Galileo parameters to simulate OD
 
