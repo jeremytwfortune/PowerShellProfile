@@ -15,34 +15,58 @@ function Set-AwsDefaultSession {
 		[string] $RoleName
 	)
 
-	function Set-EnvironmentFromToken {
-		param($token)
+	function Clear-AwsDefaultSession {
+		param(
+			[Parameter(Mandatory)]
+			[ValidateSet("Corp", "Pep")]
+			[string] $Environment
+		)
 
-		$Env:AWS_ACCESS_KEY_ID = $token.AccessKeyId
-		$Env:AWS_SECRET_ACCESS_KEY = $token.SecretAccessKey
-		$Env:AWS_SESSION_TOKEN = $token.SessionToken
-		Set-AWSCredential `
-			-AccessKey $Env:AWS_ACCESS_KEY_ID `
-			-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
-			-SessionToken $Env:AWS_SESSION_TOKEN
+		"Machine", "User", "Process" | %{
+			[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", "", [System.EnvironmentVariableTarget]::$_)
+			[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "", [System.EnvironmentVariableTarget]::$_)
+			[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", "", [System.EnvironmentVariableTarget]::$_)
+		}
+
+		if ($awsCredential = Get-Secret "aws.amazon.com/iam/$($Environment.ToLower())") {
+			$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
+			$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
+			Set-AWSCredential -ProfileName $Environment -Scope Global
+		}
+
+		switch ($Environment) {
+			"Corp" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::174627156110:mfa/jeremy" }
+			"Pep" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::621233246578:mfa/jeremy.fortune" }
+		}
 	}
 
-	& $PSScriptRoot\Clear-AwsDefaultSession $Environment
+	function Set-EnvironmentFromToken {
+		param($Token, $SessionName)
+
+		Set-AWSCredential `
+			-AccessKey $Token.AccessKeyId `
+			-SecretKey $Token.SecretAccessKey `
+			-SessionToken $Token.SessionToken `
+			-StoreAs $SessionName `
+			-ProfileLocation $HOME\.aws\credentials
+		Set-AWSCredential -ProfileName $SessionName -Scope Global
+	}
+
+	Clear-AWSDefaultSession $Environment
+	$profileName = "${Environment}Session"
 
 	$stsSessionToken = Get-STSSessionToken -SerialNumber $Env:AWS_MFA_SERIAL -TokenCode $TokenCode
-	Set-EnvironmentFromToken $stsSessionToken
+	Set-EnvironmentFromToken -Token $stsSessionToken -SessionName "${Environment}Session"
 
 	if (-Not $RoleName) { return }
 
 	switch ($RoleName) {
 		"Sandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
 	}
-
 	$stsRole = Use-STSRole `
 		-RoleArn $roleArn `
-		-AccessKey $Env:AWS_ACCESS_KEY_ID `
-		-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
-		-SessionToken $Env:AWS_SESSION_TOKEN `
-		-RoleSessionName "${RoleName}Session"
-	Set-EnvironmentFromToken $stsRole.Credentials
+		-ProfileName $profileName `
+		-RoleSessionName $profileName
+	$profileName = "${RoleName}Session"
+	Set-EnvironmentFromToken -Token $stsRole.Credentials -SessionName $profileName
 }
