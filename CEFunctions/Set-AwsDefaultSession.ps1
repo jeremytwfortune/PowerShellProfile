@@ -1,3 +1,4 @@
+#Requires -Modules Aws.Tools.Common
 #Requires -Modules AWS.Tools.SecurityToken
 
 function Set-AwsDefaultSession {

@@ -1,7 +1,3 @@
-#Requires -Modules Aws.Tools.Common
-
-# Galileo parameters to simulate OD
-
 $Env:GALILEO_REPO = "C:\Users\Jeremy\Repos\Galileo"
 $Env:NARYA_REPO = "C:\Users\Jeremy\Repos\narya"
 
@@ -11,12 +7,6 @@ $Global:CredentialStore.Tokens.OctopusApiKey = Get-Secret "OctopusApiKey"
 $Global:CredentialStore.Tokens.Proget = Get-Secret "Proget"
 
 $global:StoredAWSRegion = 'us-east-1'
-if ($awsCredential = Get-Secret "aws.amazon.com/iam/corp") {
-	$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
-	$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
-	$Env:AWS_MFA_SERIAL = "arn:aws:iam::174627156110:mfa/jeremy"
-	Set-AWSCredential -AccessKey $Env:AWS_ACCESS_KEY_ID -SecretKey $Env:AWS_SECRET_ACCESS_KEY
-}
 
 $Global:CredentialStore.CeDownloader = New-Object PSCredential("CEDownloader", (Get-Secret "CEDownloader"))
 $Global:CredentialStore.CeCorp = New-Object PSCredential("jeremy@corp", (Get-Secret "Corp"))
