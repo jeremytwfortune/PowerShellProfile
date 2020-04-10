@@ -12,7 +12,7 @@ function Set-AwsDefaultSession {
 		[string] $TokenCode = (Read-Host "Token Code"),
 
 		[Parameter()]
-		[ValidateSet("Sandbox")]
+		[ValidateSet("CorpSandbox")]
 		[string] $RoleName
 	)
 
@@ -41,8 +41,20 @@ function Set-AwsDefaultSession {
 		}
 	}
 
+	function Set-PromptColor {
+		param($ProfileName, $SessionExtension)
+
+		$Global:StoredAWSCredentialPromptColor = switch ($ProfileName) {
+			"Corp" { "Magenta" }
+			"Pep" { "Red" }
+			"CorpSandbox$SessionExtension" { "Blue" }
+			"Corp$SessionExtension" { "DarkMagenta" }
+			"Pep$SessionExtension" { "DarkRed" }
+		}
+	}
+
 	function Set-EnvironmentFromToken {
-		param($Token, $SessionName)
+		param($Token, $SessionName, $SessionExtension)
 
 		Set-AWSCredential `
 			-AccessKey $Token.AccessKeyId `
@@ -51,23 +63,33 @@ function Set-AwsDefaultSession {
 			-StoreAs $SessionName `
 			-ProfileLocation $HOME\.aws\credentials
 		Set-AWSCredential -ProfileName $SessionName -Scope Global
+		Set-PromptColor -ProfileName $SessionName -SessionExtension $SessionExtension
 	}
 
 	Clear-AWSDefaultSession $Environment
-	$profileName = "${Environment}Session"
+	$SESSION_EXTENSION = "Session"
+	$profileName = "${Environment}$SESSION_EXTENSION"
 
 	$stsSessionToken = Get-STSSessionToken -SerialNumber $Env:AWS_MFA_SERIAL -TokenCode $TokenCode
-	Set-EnvironmentFromToken -Token $stsSessionToken -SessionName "${Environment}Session"
+	Set-EnvironmentFromToken `
+		-Token $stsSessionToken `
+		-SessionName "${Environment}$SESSION_EXTENSION" `
+		-SessionExtension $SESSION_EXTENSION
 
 	if (-Not $RoleName) { return }
 
 	switch ($RoleName) {
-		"Sandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
+		"CorpSandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
 	}
 	$stsRole = Use-STSRole `
 		-RoleArn $roleArn `
 		-ProfileName $profileName `
 		-RoleSessionName $profileName
-	$profileName = "${RoleName}Session"
-	Set-EnvironmentFromToken -Token $stsRole.Credentials -SessionName $profileName
+	$profileName = "${RoleName}$SESSION_EXTENSION"
+	Set-EnvironmentFromToken `
+		-Token $stsRole.Credentials `
+		-SessionName $profileName `
+		-SessionExtension $SESSION_EXTENSION
 }
+
+Set-Alias -Name sads -Value Set-AwsDefaultSession

@@ -33,10 +33,11 @@ function prompt {
 	}
 
 	function Write-AwsProfilePrompt {
-		if ("${Env:AWS_PROFILE_NAME}" -And $Env:AWS_PROFILE_NAME -ne "default" ) {
-			$color = if ("${Env:AWS_PROMPT_COLOR}") { ${Env:AWS_PROMPT_COLOR} } else { 'Gray' }
+		if ($Global:StoredAWSCredentials -And $Global:StoredAWSCredentials -ne "default") {
+			$color = $Global:StoredAWSCredentialPromptColor ?? "Gray"
+			$credentialName = $Global:StoredAWSCredentials.ToString()
 
-			Write-Host "AWS:$Env:AWS_PROFILE_NAME" -ForegroundColor $color -NoNewLine
+			Write-Host "AWS:$credentialName" -ForegroundColor $color -NoNewLine
 		}
 	}
 
