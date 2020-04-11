@@ -1,20 +1,24 @@
 #SingleInstance Force
 EnvGet, homePath, USERPROFILE
-wtPath := homePath . "\wt-admin"
 ahkScript := homePath . "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\AutoHotKey.ahk"
-winTerminal := "ahk_exe WindowsTerminal.exe"
+
 if !A_IsAdmin {
 	Run *Runas %ahkScript%
 }
 
-~LButton & MButton::Send #{Tab}
-~MButton & WheelDown::Send ^#{Right}
-MButton & WheelUp::Send ^#{Left}
-#!0::Send {Volume_Mute}
-#!-::Send {Volume_Down}
-#!=::Send {Volume_Up}
+VsCode() {
+	vscode := "ahk_exe Code.exe"
+	if WinActive(vscode) {
+		WinMinimize, %vscode%
+	}
+	else if !WinActive(vscode) {
+		WinActivate, %vscode%
+	}
+}
 
-^`::
+WinTerminal(homePath) {
+	winTerminal := "ahk_exe WindowsTerminal.exe"
+	wtPath := homePath . "\wt-admin"
 	if !WinExist(winTerminal) {
 		Run, %wtPath%
 	}
@@ -24,3 +28,15 @@ MButton & WheelUp::Send ^#{Left}
 	else if !WinActive(winTerminal) {
 		WinActivate, %winTerminal%
 	}
+	return
+
+}
+
+~LButton & MButton::Send #{Tab}
+~MButton & WheelDown::Send ^#{Right}
+MButton & WheelUp::Send ^#{Left}
+#!0::Send {Volume_Mute}
+#!-::Send {Volume_Down}
+#!=::Send {Volume_Up}
+!`::VsCode()
+^`::WinTerminal(homePath)
