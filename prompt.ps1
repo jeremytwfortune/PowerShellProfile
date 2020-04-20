@@ -10,12 +10,17 @@ function prompt {
 				Repos = $Repos
 			}
 		)
-		if ( $shortcuts = $ShortcutDirectories.GetEnumerator() | ? { "$Path*" -Like "$($_.Value)*" } ) {
+		$shortcutPath = if ( $shortcuts = $ShortcutDirectories.GetEnumerator() | ? { "$Path*" -Like "$($_.Value)*" } ) {
 			$shortcut = $shortcuts | Sort-Object -Property Value -Descending | Select-Object -First 1 # Hacky
 			$Path -Replace [regex]::Escape("$($shortcut.Value)"), "$($shortcut.Name)"
 		} else {
 			$Path -Replace [regex]::Escape("Microsoft.PowerShell.Core\FileSystem::"), ""
 		}
+
+		if (($pathParts = $shortcutPath -split '\\').Count -gt 4) {
+			return "$($pathParts[0])\...\$($pathParts[-2])\$($pathParts[-1])"
+		}
+		$shortcutPath
 	}
 
 	function Get-StatusColor {
