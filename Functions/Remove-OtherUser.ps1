@@ -21,4 +21,4 @@ function Remove-OtherUser {
 	}
 }
 
-Set-Alias rou Remove-OtherUsers
+Set-Alias rou Remove-OtherUser
