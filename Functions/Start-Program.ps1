@@ -36,4 +36,4 @@ function Start-Program {
 	}
 }
 
-Set-Alias -Name stp -Value Start-Program
+Set-Alias -Name sap -Value Start-Program
