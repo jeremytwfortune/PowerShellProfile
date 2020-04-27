@@ -10,7 +10,7 @@ $global:StoredAWSRegion = 'us-east-1'
 
 $Global:CredentialStore.CeDownloader = New-Object PSCredential("CEDownloader", (Get-Secret "CEDownloader"))
 $Global:CredentialStore.CeCorp = New-Object PSCredential("jeremy@corp", (Get-Secret "Corp"))
-$Global:CredentialStore.CePep = New-Object PSCredential("jeremy.fortune@pep.careevolution.com", (Get-Secret "Pep"))
+$Global:CredentialStore.CePep = New-Object PSCredential("jeremy.fortune@pep", (Get-Secret "Pep"))
 $Global:CredentialStore.Ce = New-Object PSCredential("jeremy", (Get-Secret "Corp"))
 
 if ( Test-Path $Home\CeServers.json ){
