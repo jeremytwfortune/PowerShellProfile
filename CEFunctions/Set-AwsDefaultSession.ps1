@@ -63,6 +63,9 @@ function Set-AwsDefaultSession {
 			-StoreAs $SessionName `
 			-ProfileLocation $HOME\.aws\credentials
 		Set-AWSCredential -ProfileName $SessionName -Scope Global
+		$Env:AWS_ACCESS_KEY_ID = $Token.AccessKeyId
+		$Env:AWS_SECRET_ACCESS_KEY = $Token.SecretAccessKey
+		$Env:AWS_SESSION_TOKEN = $Token.SessionToken
 		Set-PromptColor -ProfileName $SessionName -SessionExtension $SessionExtension
 	}
 
