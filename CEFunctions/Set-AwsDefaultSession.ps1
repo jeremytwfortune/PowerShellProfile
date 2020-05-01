@@ -4,16 +4,16 @@
 function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
-		[Parameter(Mandatory)]
+		[Parameter(Mandatory, Position = 0)]
 		[ValidateSet("Corp", "Pep")]
 		[string] $Environment,
 
-		[Parameter()]
-		[string] $TokenCode = (Read-Host "Token Code"),
+		[Parameter(Position = 1)]
+		[ValidateSet("CorpSandbox")]
+		[string] $RoleName,
 
 		[Parameter()]
-		[ValidateSet("CorpSandbox")]
-		[string] $RoleName
+		[string] $TokenCode = (Read-Host "Token Code")
 	)
 
 	function Clear-AwsDefaultSession {
