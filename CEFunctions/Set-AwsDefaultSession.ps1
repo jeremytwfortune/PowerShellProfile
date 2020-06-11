@@ -9,7 +9,7 @@ function Set-AwsDefaultSession {
 		[string] $Environment,
 
 		[Parameter(Position = 1)]
-		[ValidateSet("CorpSandbox")]
+		[ValidateSet("Sandbox")]
 		[string] $RoleName,
 
 		[Parameter()]
@@ -82,13 +82,13 @@ function Set-AwsDefaultSession {
 	if (-Not $RoleName) { return }
 
 	switch ($RoleName) {
-		"CorpSandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
+		"Sandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
 	}
 	$stsRole = Use-STSRole `
 		-RoleArn $roleArn `
 		-ProfileName $profileName `
 		-RoleSessionName $profileName
-	$profileName = "${RoleName}$SESSION_EXTENSION"
+	$profileName = "$Environment$RoleName$SESSION_EXTENSION"
 	Set-EnvironmentFromToken `
 		-Token $stsRole.Credentials `
 		-SessionName $profileName `
