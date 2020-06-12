@@ -23,6 +23,7 @@ function Set-AwsDefaultSession {
 			[string] $Environment
 		)
 
+		Write-Verbose "Clearing AWS session, setting to '$Environment'"
 		"Machine", "User", "Process" | %{
 			[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", "", [System.EnvironmentVariableTarget]::$_)
 			[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "", [System.EnvironmentVariableTarget]::$_)
@@ -32,6 +33,11 @@ function Set-AwsDefaultSession {
 		if ($awsCredential = Get-Secret "aws.amazon.com/iam/$($Environment.ToLower())") {
 			$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
 			$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
+			Set-AWSCredential `
+				-AccessKey $Env:AWS_ACCESS_KEY_ID `
+				-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
+				-StoreAs $Environment `
+				-ProfileLocation $HOME\.aws\credentials
 			Set-AWSCredential -ProfileName $Environment -Scope Global
 		}
 
@@ -53,15 +59,34 @@ function Set-AwsDefaultSession {
 		}
 	}
 
+	function Convert-SessionToConvention {
+		param($SessionName, $SessionExtension)
+		switch ($SessionName) {
+			"Corp$SessionExtension" { "mfa" }
+			"CorpSandbox$SessionExtension" { "sandbox" }
+			"Pep$SessionExtension" { "pep" }
+		}
+	}
+
 	function Set-EnvironmentFromToken {
 		param($Token, $SessionName, $SessionExtension)
 
+		Write-Verbose "Setting profile '$SessionName'"
 		Set-AWSCredential `
 			-AccessKey $Token.AccessKeyId `
 			-SecretKey $Token.SecretAccessKey `
 			-SessionToken $Token.SessionToken `
 			-StoreAs $SessionName `
 			-ProfileLocation $HOME\.aws\credentials
+		if ($convertedSession = Convert-SessionToConvention -SessionName $SessionName -SessionExtension $SessionExtension) {
+			Write-Verbose "Setting converted profile '$convertedSession'"
+			Set-AWSCredential `
+				-AccessKey $Token.AccessKeyId `
+				-SecretKey $Token.SecretAccessKey `
+				-SessionToken $Token.SessionToken `
+				-StoreAs $convertedSession `
+				-ProfileLocation $HOME\.aws\credentials
+		}
 		Set-AWSCredential -ProfileName $SessionName -Scope Global
 		$Env:AWS_ACCESS_KEY_ID = $Token.AccessKeyId
 		$Env:AWS_SECRET_ACCESS_KEY = $Token.SecretAccessKey
