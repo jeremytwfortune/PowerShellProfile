@@ -56,10 +56,12 @@ function Set-AwsDefaultSession {
 
 		$Global:StoredAWSCredentialPromptColor = switch ($ProfileName) {
 			"Corp" { "Magenta" }
-			"Pep" { "Red" }
-			"CorpSandbox$SessionExtension" { "Blue" }
 			"Corp$SessionExtension" { "DarkMagenta" }
+			"CorpSandbox$SessionExtension" { "Blue" }
+			"CorpAdmin$SessionExtension" { "Green" }
+			"Pep" { "Red" }
 			"Pep$SessionExtension" { "DarkRed" }
+			"PepAdmin$SessionExtension" { "White" }
 		}
 	}
 
@@ -68,7 +70,9 @@ function Set-AwsDefaultSession {
 		switch ($SessionName) {
 			"Corp$SessionExtension" { "mfa" }
 			"CorpSandbox$SessionExtension" { "sandbox" }
+			"CorpAdmin$SessionExtension" { "admin" }
 			"Pep$SessionExtension" { "pep" }
+			"PepAdmin$SessionExtension" { "restricted" }
 		}
 	}
 
@@ -110,8 +114,10 @@ function Set-AwsDefaultSession {
 
 	if (-Not $RoleName) { return }
 
-	switch ($RoleName) {
-		"Sandbox" { $roleArn = "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
+	$roleArn = switch ($RoleName) {
+		"Sandbox" { "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
+		{"Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole" }
+		{"Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole" }
 	}
 	$stsRole = Use-STSRole `
 		-RoleArn $roleArn `
