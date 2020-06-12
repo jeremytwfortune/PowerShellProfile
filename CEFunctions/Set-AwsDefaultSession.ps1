@@ -33,13 +33,17 @@ function Set-AwsDefaultSession {
 		if ($awsCredential = Get-Secret "aws.amazon.com/iam/$($Environment.ToLower())") {
 			$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
 			$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
-			Set-AWSCredential `
-				-AccessKey $Env:AWS_ACCESS_KEY_ID `
-				-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
-				-StoreAs $Environment `
-				-ProfileLocation $HOME\.aws\credentials
-			Set-AWSCredential -ProfileName $Environment -Scope Global
 		}
+		if (-Not ($storedCredential = Get-AWSCredential -ProfileName $Environment) -or
+			$storedCredential.GetCredentials().AccessKey -ne $Env:AWS_ACCESS_KEY_ID) {
+				Write-Verbose "Credentials file contains a different access key, updating file"
+				Set-AWSCredential `
+					-AccessKey $Env:AWS_ACCESS_KEY_ID `
+					-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
+					-StoreAs $Environment `
+					-ProfileLocation $HOME\.aws\credentials
+		}
+		Set-AWSCredential -ProfileName $Environment -Scope Global
 
 		switch ($Environment) {
 			"Corp" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::174627156110:mfa/jeremy" }
@@ -79,7 +83,7 @@ function Set-AwsDefaultSession {
 			-StoreAs $SessionName `
 			-ProfileLocation $HOME\.aws\credentials
 		if ($convertedSession = Convert-SessionToConvention -SessionName $SessionName -SessionExtension $SessionExtension) {
-			Write-Verbose "Setting converted profile '$convertedSession'"
+			Write-Verbose "Setting conventional profile '$convertedSession'"
 			Set-AWSCredential `
 				-AccessKey $Token.AccessKeyId `
 				-SecretKey $Token.SecretAccessKey `
