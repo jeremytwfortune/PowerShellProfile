@@ -18,7 +18,7 @@ Get-ChildItem "$(Split-Path $PROFILE)\Functions" | %{
 
 $Global:SecretKeys = @()
 $Global:CredentialStore = @{ Tokens = @{} }
-if ( $oAuthCredential = Get-Secret -Name "api.github.com/oauth" ) {
+if ( $oAuthCredential = Get-Secret -Name "api.github.com/oauth" -AsPlainText ) {
 	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential
 }
 
