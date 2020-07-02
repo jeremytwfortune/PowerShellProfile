@@ -60,9 +60,17 @@ function prompt {
 		Write-Host "$(Get-ShortPath -Path (Get-Location)) " -NoNewline -ForegroundColor Cyan
 	}
 
+	function Write-PythonVenv {
+		if ($Env:VIRTUAL_ENV) {
+			$venvName = $Env:VIRTUAL_ENV -split '\\' | Select-Object -Last 1
+			Write-Host "$venvName " -NoNewline -ForegroundColor Blue
+		}
+	}
+
 	Write-Host
 	Write-Path
 	Write-GitHead
+	Write-PythonVenv
 	Write-AwsProfilePrompt
 	Write-Host
 	Write-Host ">" -NoNewline
