@@ -114,25 +114,24 @@ function Set-AwsDefaultSession {
 		$stsSessionToken = Get-STSSessionToken -SerialNumber $Env:AWS_MFA_SERIAL -TokenCode $TokenCode
 		Set-EnvironmentFromToken `
 			-Token $stsSessionToken `
-			-SessionName "${Environment}$SESSION_EXTENSION" `
-			-SessionExtension $SESSION_EXTENSION
+			-SessionName "${Environment}$SessionExtension" `
+			-SessionExtension $SessionExtension
 
 		if (-Not $RoleName) { return }
 
 		$roleArn = switch ($RoleName) {
-			"Sandbox" { "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
-			{"Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole" }
-			{"Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole" }
+			{"Sandbox"} { "arn:aws:iam::308326368506:role/ParentAccountAdministrator"; break }
+			{"Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole"; break }
+			{"Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole"; break }
 		}
 		$stsRole = Use-STSRole `
 			-RoleArn $roleArn `
-			-ProfileName $profileName `
+			-ProfileName "${Environment}$SessionExtension" `
 			-RoleSessionName $profileName
-		$profileName = "$Environment$RoleName$SESSION_EXTENSION"
 		Set-EnvironmentFromToken `
 			-Token $stsRole.Credentials `
 			-SessionName $profileName `
-			-SessionExtension $SESSION_EXTENSION
+			-SessionExtension $SessionExtension
 	}
 
 	function Test-ExistingSession {
@@ -146,6 +145,7 @@ function Set-AwsDefaultSession {
 		$False
 	}
 
+	$ErrorActionPreference = "Stop"
 	$SESSION_EXTENSION = "Session"
 	$profileName = "$Environment$RoleName$SESSION_EXTENSION"
 
