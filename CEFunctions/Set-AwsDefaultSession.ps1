@@ -160,7 +160,7 @@ function Set-AwsDefaultSession {
 		-Environment $Environment `
 		-ProfileName $ProfileName `
 		-RoleName $RoleName `
-		-SessionExtension $SessionExtension
+		-SessionExtension $SESSION_EXTENSION
 }
 
 Set-Alias -Name sads -Value Set-AwsDefaultSession
