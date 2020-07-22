@@ -9,7 +9,7 @@ function Set-AwsDefaultSession {
 		[string] $Environment,
 
 		[Parameter(Position = 1)]
-		[ValidateSet("Sandbox", "Admin")]
+		[ValidateSet("Sandbox", "Galileo", "Admin")]
 		[string] $RoleName
 	)
 
@@ -52,13 +52,14 @@ function Set-AwsDefaultSession {
 		param($ProfileName, $SessionExtension)
 
 		$Global:StoredAWSCredentialPromptColor = switch ($ProfileName) {
-			"Corp" { "Magenta" }
-			"Corp$SessionExtension" { "DarkMagenta" }
+			"Corp" { "Yellow" }
+			"Corp$SessionExtension" { "Green" }
 			"CorpSandbox$SessionExtension" { "Blue" }
-			"CorpAdmin$SessionExtension" { "Green" }
-			"Pep" { "Red" }
+			"CorpGalileo$SessionExtension" { "Magenta" }
+			"CorpAdmin$SessionExtension" { "DarkRed" }
+			"Pep" { "White" }
 			"Pep$SessionExtension" { "DarkRed" }
-			"PepAdmin$SessionExtension" { "White" }
+			"PepAdmin$SessionExtension" { "Red" }
 		}
 	}
 
@@ -120,10 +121,12 @@ function Set-AwsDefaultSession {
 		if (-Not $RoleName) { return }
 
 		$roleArn = switch ($RoleName) {
-			{"Sandbox"} { "arn:aws:iam::308326368506:role/ParentAccountAdministrator"; break }
-			{"Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole"; break }
-			{"Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole"; break }
+			{$RoleName -eq "Sandbox"} { "arn:aws:iam::308326368506:role/ParentAccountAdministrator"; break }
+			{$RoleName -eq "Galileo"} { "arn:aws:iam::978150820456:role/OrganizationAccountAccessRole"; break }
+			{$RoleName -eq "Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole"; break }
+			{$RoleName -eq "Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole"; break }
 		}
+		Write-Verbose "Assuming role arn '$roleArn' under role name '$RoleName'"
 		$stsRole = Use-STSRole `
 			-RoleArn $roleArn `
 			-ProfileName "${Environment}$SessionExtension" `
