@@ -1,5 +1,4 @@
-#Requires -Modules Aws.Tools.Common
-#Requires -Modules AWS.Tools.SecurityToken
+#Requires -Modules Aws.Tools.Common, AWS.Tools.SecurityToken, Microsoft.PowerShell.SecretManagement
 
 function Set-AwsDefaultSession {
 	[CmdletBinding()]
@@ -9,7 +8,7 @@ function Set-AwsDefaultSession {
 		[string] $Environment,
 
 		[Parameter(Position = 1)]
-		[ValidateSet("Sandbox", "Admin")]
+		[ValidateSet("Sandbox", "Galileo", "Admin")]
 		[string] $RoleName
 	)
 
@@ -27,38 +26,31 @@ function Set-AwsDefaultSession {
 			[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", "", [System.EnvironmentVariableTarget]::$_)
 		}
 
-		if ($awsCredential = Get-Secret "aws.amazon.com/iam/$($Environment.ToLower())") {
-			$Env:AWS_ACCESS_KEY_ID = $awsCredential.UserName
-			$Env:AWS_SECRET_ACCESS_KEY = $awsCredential.GetNetworkCredential().Password
-		}
-		if (-Not ($storedCredential = Get-AWSCredential -ProfileName $Environment) -or
-			$storedCredential.GetCredentials().AccessKey -ne $Env:AWS_ACCESS_KEY_ID) {
+		$awsCredential = Get-Secret "aws.amazon.com/iam/$($Environment.ToLower())"
+		$storedCredential = Get-AWSCredential -ProfileName $Environment
+		if ($awsCredential -And (-Not ($storedCredential) -Or $storedCredential.GetCredentials().AccessKey -Ne $awsCredential.UserName)) {
 				Write-Verbose "Credentials file contains a different access key, updating file"
 				Set-AWSCredential `
-					-AccessKey $Env:AWS_ACCESS_KEY_ID `
-					-SecretKey $Env:AWS_SECRET_ACCESS_KEY `
+					-AccessKey $awsCredential.UserName `
+					-SecretKey $awsCredential.GetNetworkCredential().Password `
 					-StoreAs $Environment `
 					-ProfileLocation $HOME\.aws\credentials
 		}
 		Set-AWSCredential -ProfileName $Environment -Scope Global
-
-		switch ($Environment) {
-			"Corp" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::174627156110:mfa/jeremy" }
-			"Pep" { $Env:AWS_MFA_SERIAL = "arn:aws:iam::621233246578:mfa/jeremy.fortune" }
-		}
 	}
 
 	function Set-PromptColor {
 		param($ProfileName, $SessionExtension)
 
 		$Global:StoredAWSCredentialPromptColor = switch ($ProfileName) {
-			"Corp" { "Magenta" }
-			"Corp$SessionExtension" { "DarkMagenta" }
+			"Corp" { "Yellow" }
+			"Corp$SessionExtension" { "Green" }
 			"CorpSandbox$SessionExtension" { "Blue" }
-			"CorpAdmin$SessionExtension" { "Green" }
-			"Pep" { "Red" }
+			"CorpGalileo$SessionExtension" { "Magenta" }
+			"CorpAdmin$SessionExtension" { "DarkRed" }
+			"Pep" { "White" }
 			"Pep$SessionExtension" { "DarkRed" }
-			"PepAdmin$SessionExtension" { "White" }
+			"PepAdmin$SessionExtension" { "Red" }
 		}
 	}
 
@@ -74,7 +66,16 @@ function Set-AwsDefaultSession {
 	}
 
 	function Set-EnvironmentFromToken {
-		param($Token, $SessionName, $SessionExtension)
+		param(
+			[Parameter(Mandatory)]
+			[Amazon.SecurityToken.Model.Credentials] $Token,
+
+			[Parameter(Mandatory)]
+			[string] $SessionName,
+
+			[Parameter(Mandatory)]
+			[string] $SessionExtension
+		)
 
 		Write-Verbose "Setting profile '$SessionName'"
 		Set-AWSCredential `
@@ -93,59 +94,85 @@ function Set-AwsDefaultSession {
 				-ProfileLocation $HOME\.aws\credentials
 		}
 		Set-AWSCredential -ProfileName $SessionName -Scope Global
-		$Env:AWS_ACCESS_KEY_ID = $Token.AccessKeyId
-		$Env:AWS_SECRET_ACCESS_KEY = $Token.SecretAccessKey
-		$Env:AWS_SESSION_TOKEN = $Token.SessionToken
 		Set-PromptColor -ProfileName $SessionName -SessionExtension $SessionExtension
+	}
+
+	function Get-MfaSerialNumber {
+		param(
+			[Parameter(Mandatory)]
+			[ValidateSet("Corp", "Pep")]
+			[string] $Environment
+		)
+
+		$userName = Get-STSCallerIdentity -ProfileName $Environment |
+			Select-Object -ExpandProperty arn |
+			ForEach-Object { $_ -split '/' } |
+			Select-Object -Last 1
+		$mfaDevice = Get-IAMMFADevice -UserName $userName -ProfileName $Environment
+		$mfaDevice.SerialNumber
 	}
 
 	function Start-NewSession {
 		param(
-			$Environment,
-			$ProfileName,
-			$RoleName,
-			$SessionExtension
+			[Parameter(Mandatory)]
+			[ValidateSet("Corp", "Pep")]
+			[string] $Environment,
+
+			[Parameter(Mandatory)]
+			[string] $ProfileName,
+
+			[Parameter(Mandatory)]
+			[string] $RoleName,
+
+			[Parameter(Mandatory)]
+			[string] $SessionExtension
 		)
 
 		Clear-AWSDefaultSession $Environment
 
-		$TokenCode = Read-Host "Token Code ($Environment)"
-
-		$stsSessionToken = Get-STSSessionToken -SerialNumber $Env:AWS_MFA_SERIAL -TokenCode $TokenCode
+		$serialNumber = Get-MfaSerialNumber -Environment $Environment
+		$tokenCode = Read-Host "Token Code ($Environment)"
+		$stsSessionToken = Get-STSSessionToken -SerialNumber $serialNumber -TokenCode $tokenCode
 		Set-EnvironmentFromToken `
 			-Token $stsSessionToken `
-			-SessionName "${Environment}$SESSION_EXTENSION" `
-			-SessionExtension $SESSION_EXTENSION
+			-SessionName "${Environment}$SessionExtension" `
+			-SessionExtension $SessionExtension
 
 		if (-Not $RoleName) { return }
 
 		$roleArn = switch ($RoleName) {
-			"Sandbox" { "arn:aws:iam::308326368506:role/ParentAccountAdministrator" }
-			{"Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole" }
-			{"Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole" }
+			{$RoleName -eq "Sandbox"} { "arn:aws:iam::308326368506:role/ParentAccountAdministrator"; break }
+			{$RoleName -eq "Galileo"} { "arn:aws:iam::978150820456:role/OrganizationAccountAccessRole"; break }
+			{$RoleName -eq "Admin" -and $Environment -eq "Corp"} { "arn:aws:iam::174627156110:role/CareEvolutionAdministratorRole"; break }
+			{$RoleName -eq "Admin" -and $Environment -eq "Pep"} { "arn:aws:iam::386335162752:role/OrganizationAccountAccessRole"; break }
 		}
+		Write-Verbose "Assuming role arn '$roleArn' under role name '$RoleName'"
 		$stsRole = Use-STSRole `
 			-RoleArn $roleArn `
-			-ProfileName $profileName `
+			-ProfileName "${Environment}$SessionExtension" `
 			-RoleSessionName $profileName
-		$profileName = "$Environment$RoleName$SESSION_EXTENSION"
 		Set-EnvironmentFromToken `
 			-Token $stsRole.Credentials `
 			-SessionName $profileName `
-			-SessionExtension $SESSION_EXTENSION
+			-SessionExtension $SessionExtension
 	}
 
 	function Test-ExistingSession {
-		param($ProfileName)
+		param(
+			[Parameter(Mandatory)]
+			$ProfileName
+		)
 
 		try {
-			if ($sts = Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue) {
+			$sts = Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue
+			if ($sts) {
 				return $True
 			}
 		} catch {}
 		$False
 	}
 
+	$ErrorActionPreference = "Stop"
 	$SESSION_EXTENSION = "Session"
 	$profileName = "$Environment$RoleName$SESSION_EXTENSION"
 
@@ -160,7 +187,7 @@ function Set-AwsDefaultSession {
 		-Environment $Environment `
 		-ProfileName $ProfileName `
 		-RoleName $RoleName `
-		-SessionExtension $SessionExtension
+		-SessionExtension $SESSION_EXTENSION
 }
 
 Set-Alias -Name sads -Value Set-AwsDefaultSession

@@ -55,3 +55,4 @@ if ( $Work ) {
 }
 
 Install-Module -Name PSReadLine -Force
+Install-Module -Name PowerLine
