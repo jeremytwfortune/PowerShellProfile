@@ -122,10 +122,9 @@ function Set-AwsDefaultSession {
 			[string] $ProfileName,
 
 			[Parameter(Mandatory)]
-			[string] $RoleName,
+			[string] $SessionExtension,
 
-			[Parameter(Mandatory)]
-			[string] $SessionExtension
+			[string] $RoleName
 		)
 
 		Clear-AWSDefaultSession $Environment
