@@ -20,13 +20,11 @@ function Set-AwsDefaultSession {
 		)
 
 		Write-Verbose "Clearing AWS session, setting to '$Environment'"
-		"Machine", "User", "Process" | %{
-			[Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", "", [System.EnvironmentVariableTarget]::$_)
-			[Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "", [System.EnvironmentVariableTarget]::$_)
-			[Environment]::SetEnvironmentVariable("AWS_SESSION_TOKEN", "", [System.EnvironmentVariableTarget]::$_)
-		}
+		Clear-AWSCredential -Scope Global
 
+		Write-Verbose "Obtaining credentials from keyring"
 		$awsCredential = Get-Secret "aws.amazon.com/iam/$($Environment.ToLower())"
+		Write-Verbose "Loading profile from credentials file"
 		$storedCredential = Get-AWSCredential -ProfileName $Environment
 		if ($awsCredential -And (-Not ($storedCredential) -Or $storedCredential.GetCredentials().AccessKey -Ne $awsCredential.UserName)) {
 				Write-Verbose "Credentials file contains a different access key, updating file"
@@ -112,6 +110,21 @@ function Set-AwsDefaultSession {
 		$mfaDevice.SerialNumber
 	}
 
+	function Test-ExistingSession {
+		param(
+			[Parameter(Mandatory)]
+			$ProfileName
+		)
+
+		try {
+			$sts = Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue
+			if ($sts) {
+				return $True
+			}
+		} catch {}
+		$False
+	}
+
 	function Start-NewSession {
 		param(
 			[Parameter(Mandatory)]
@@ -129,13 +142,15 @@ function Set-AwsDefaultSession {
 
 		Clear-AWSDefaultSession $Environment
 
-		$serialNumber = Get-MfaSerialNumber -Environment $Environment
-		$tokenCode = Read-Host "Token Code ($Environment)"
-		$stsSessionToken = Get-STSSessionToken -SerialNumber $serialNumber -TokenCode $tokenCode
-		Set-EnvironmentFromToken `
-			-Token $stsSessionToken `
-			-SessionName "${Environment}$SessionExtension" `
-			-SessionExtension $SessionExtension
+		if ($RoleName -And -Not (Test-ExistingSession -ProfileName "${Environment}$SessionExtension")) {
+			$serialNumber = Get-MfaSerialNumber -Environment $Environment
+			$tokenCode = Read-Host "Token Code ($Environment)"
+			$stsSessionToken = Get-STSSessionToken -SerialNumber $serialNumber -TokenCode $tokenCode -DurationInSeconds 43200
+			Set-EnvironmentFromToken `
+				-Token $stsSessionToken `
+				-SessionName "${Environment}$SessionExtension" `
+				-SessionExtension $SessionExtension
+		}
 
 		if (-Not $RoleName) { return }
 
@@ -154,21 +169,6 @@ function Set-AwsDefaultSession {
 			-Token $stsRole.Credentials `
 			-SessionName $profileName `
 			-SessionExtension $SessionExtension
-	}
-
-	function Test-ExistingSession {
-		param(
-			[Parameter(Mandatory)]
-			$ProfileName
-		)
-
-		try {
-			$sts = Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue
-			if ($sts) {
-				return $True
-			}
-		} catch {}
-		$False
 	}
 
 	$ErrorActionPreference = "Stop"
