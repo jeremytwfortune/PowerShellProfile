@@ -3,24 +3,25 @@ param ( [Switch] $Work )
 Set-ExecutionPolicy Bypass; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 choco install -y `
-	7zip `
 	googlechrome `
+	powershell-core `
+	microsoft-windows-terminal `
+	dashlane `
+	vscode `
+	7zip `
 	git `
+	slack `
 	ag `
 	gpg4win `
 	gimp `
 	licecap `
 	greenshot `
 	windirstat `
-	conemu `
-	dashlane `
 	office365proplus `
 	vim `
 	autohotkey `
 	f.lux.install `
-	rainmeter `
-	slack `
-	vscode
+	rainmeter
 
 refreshenv
 code --install-extension Shan.code-settings-sync
@@ -35,9 +36,10 @@ if ( $Work ) {
 		rdcman `
 		r.studio `
 		citrix-receiver `
-		nuget.commandline
+		nuget.commandline `
+		dotnetcore-sdk
 
-	choco install -y nodejs --version 10.7.0
+	choco install -y nodejs --version 12.19.0
 	# CE rdcman rdg file available in CE Google Drive
 
 	Start-Process "https://www.microsoft.com/en-us/sql-server/sql-server-downloads"
