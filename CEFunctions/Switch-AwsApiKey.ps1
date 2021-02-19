@@ -4,7 +4,7 @@ function Switch-AwsApiKey {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory)]
-		[ValidateSet("Corp", "Pep")]
+		[ValidateSet("Corp", "Pep", IgnoreCase=$False)]
 		$Environment
 	)
 

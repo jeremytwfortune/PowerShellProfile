@@ -4,7 +4,7 @@ function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
-		[ValidateSet("Corp", "Pep")]
+		[ValidateSet("Corp", "Pep", IgnoreCase=$False)]
 		[string] $Environment
 	)
 	dynamicparam {
