@@ -17,10 +17,25 @@ choco install -y `
 	vim `
 
 refreshenv
-code --install-extension Shan.code-settings-sync
 
+Install-Module -Name "Microsoft.PowerShell.SecretManagement" -AllowPrerelease
+Install-Module -Name "AWS.Tools.Installer"
 Install-Module -Name PSReadLine -Force
 Install-Module -Name PowerLine
+
+Install-AWSToolsModule -Name `
+	AWS.Tools.CloudWatchLogs, `
+	AWS.Tools.Common, `
+	AWS.Tools.EC2, `
+	AWS.Tools.ECS, `
+	AWS.Tools.IdentityManagement, `
+	AWS.Tools.Lambda, `
+	AWS.Tools.Redshift, `
+	AWS.Tools.S3, `
+	AWS.Tools.SecretsManager, `
+	AWS.Tools.SecurityToken, `
+	AWS.Tools.SimpleNotificationService, `
+	AWS.Tools.WorkSpaces
 
 Copy-Item "$PSScriptRoot\ProgramList.txt" $HOME
 Copy-Item "$PSScriptRoot\AwsAssumableRoles.txt" $HOME
