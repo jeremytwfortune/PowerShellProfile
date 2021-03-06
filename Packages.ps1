@@ -56,7 +56,6 @@ if ( $Machine -in ("Work", "Home") ) {
 
 	Copy-Item "$PSScriptRoot\wt-admin.lnk" $HOME
 	Copy-Item "$PSScriptRoot\AutoHotKey.ahk" "$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
-
 }
 
 if ( $Machine -eq "Work" ) {
@@ -80,4 +79,18 @@ if ( $Machine -eq "Work" ) {
 	"MSMQ-HTTP" | ForEach-Object {
 		Enable-WindowsOptionalFeature -Online -FeatureName $_ -All
 	}
+}
+
+if ( $Machine -eq "WorkSpace") {
+	choco uninstall -y `
+		aws-vault `
+		awscli `
+		filezilla `
+		gitextensions `
+		GPMC `
+		linqpad `
+		notepadplusplus `
+		rdmfree `
+		rdtabs `
+		putty
 }
