@@ -8,7 +8,6 @@ Set-ExecutionPolicy Bypass; iex ((New-Object System.Net.WebClient).DownloadStrin
 choco install -y `
 	googlechrome `
 	powershell-core `
-	microsoft-windows-terminal `
 	vscode `
 	7zip `
 	git `
@@ -21,7 +20,7 @@ refreshenv
 Install-Module -Name "Microsoft.PowerShell.SecretManagement" -AllowPrerelease
 Install-Module -Name "AWS.Tools.Installer"
 Install-Module -Name PSReadLine -Force
-Install-Module -Name PowerLine
+Install-Module -Name PowerLine -AllowClobber
 
 Install-AWSToolsModule -Name `
 	AWS.Tools.CloudWatchLogs, `
@@ -46,6 +45,7 @@ if ( $Machine -in ("Work", "Home") ) {
 	choco install -y `
 		autohotkey `
 		office365proplus `
+		microsoft-windows-terminal `
 		f.lux.install `
 		rainmeter `
 		windirstat `
@@ -93,4 +93,6 @@ if ( $Machine -eq "WorkSpace") {
 		rdmfree `
 		rdtabs `
 		putty
+
+	choco install -y conemu
 }
