@@ -10,17 +10,21 @@ choco install -y `
 	powershell-core `
 	vscode `
 	7zip `
-	git `
-	ag `
-	gpg4win `
-	vim `
+	git
 
 refreshenv
 
 Install-Module -Name "Microsoft.PowerShell.SecretManagement" -AllowPrerelease
+Install-Module -Name "Microsoft.PowerShell.SecretStore" -AllowPrerelease
 Install-Module -Name "AWS.Tools.Installer"
 Install-Module -Name PSReadLine -Force
 Install-Module -Name PowerLine -AllowClobber
+
+Set-SecretStoreConfiguration
+Register-SecretVault `
+	-Name SecretStore `
+	-ModuleName Microsoft.PowerShell.SecretStore `
+	-DefaultVault
 
 Install-AWSToolsModule -Name `
 	AWS.Tools.CloudWatchLogs, `
@@ -53,6 +57,9 @@ if ( $Machine -in ("Work", "Home") ) {
 		slack `
 		gimp `
 		licecap `
+		ag `
+		gpg4win `
+		vim `
 
 	Copy-Item "$PSScriptRoot\wt-admin.lnk" $HOME
 	Copy-Item "$PSScriptRoot\AutoHotKey.ahk" "$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
