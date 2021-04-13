@@ -144,6 +144,29 @@ function Set-AwsDefaultSession {
 			$False
 		}
 
+		function Read-TokenCode {
+			param(
+				[Parameter(Mandatory)]
+				[ValidateSet("Corp", "Pep")]
+				[string] $Environment
+			)
+
+			$totpMap = @{
+				"Corp" = "Main IAM"
+				"Pep" = "PEP IAM"
+			}
+
+			try {
+				$Env:OP_SESSION_careevolution = Get-Secret "1Password" |
+					ConvertFrom-SecureString -AsPlainText |
+					op signin careevolution --raw
+				op get totp $totpMap[$Environment]
+			}
+			catch {
+				Read-Host "Token Code ($Environment)"
+			}
+		}
+
 		function Start-NewSession {
 			param(
 				[Parameter(Mandatory)]
@@ -163,7 +186,7 @@ function Set-AwsDefaultSession {
 
 			if (-Not (Test-ExistingSession -ProfileName "${Environment}$SessionExtension")) {
 				$serialNumber = Get-MfaSerialNumber -Environment $Environment
-				$tokenCode = Read-Host "Token Code ($Environment)"
+				$tokenCode = Read-TokenCode -Environment $Environment
 				$stsSessionToken = Get-STSSessionToken -SerialNumber $serialNumber -TokenCode $tokenCode -DurationInSeconds 43200
 				Set-EnvironmentFromToken `
 					-Token $stsSessionToken `
