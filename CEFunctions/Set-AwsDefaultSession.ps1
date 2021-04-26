@@ -160,11 +160,14 @@ function Set-AwsDefaultSession {
 				$Env:OP_SESSION_careevolution = Get-Secret "1Password" |
 					ConvertFrom-SecureString -AsPlainText |
 					op signin careevolution --raw
-				op get totp $totpMap[$Environment]
+				$totp = op get totp $totpMap[$Environment]
 			}
 			catch {
-				Read-Host "Token Code ($Environment)"
 			}
+			if ($totp) {
+				return $totp
+			}
+			Read-Host "Token Code ($Environment)"
 		}
 
 		function Start-NewSession {
