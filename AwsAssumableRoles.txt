@@ -1,0 +1,4 @@
+Sandbox = arn:aws:iam::
+Galileo = arn:aws:iam::
+WebClientTestDev = arn:aws:iam::
+TenantGroupTest = arn:aws:iam::

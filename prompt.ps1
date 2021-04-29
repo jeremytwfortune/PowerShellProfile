@@ -34,7 +34,7 @@ function Write-PromptAwsProfile {
 		$color = $Global:StoredAWSCredentialPromptColor ?? "Gray"
 		$credentialName = $Global:StoredAWSCredentials.ToString()
 
-		"$credentialName " | New-PromptText -ForegroundColor Black -BackgroundColor $color
+		"🔑 $credentialName" | New-PromptText -ForegroundColor Black -BackgroundColor $color
 	}
 }
 
@@ -44,17 +44,17 @@ function Write-PromptGitHead {
 		if ( -Not ( $headReference = git symbolic-ref --short HEAD 2>$Null ) ) {
 			$headReference = (git rev-parse HEAD 2>$Null).Substring(0, 8)
 		}
-		" $headReference" | New-PromptText -ForegroundColor Black -BackgroundColor (Get-PromptStatusBackgroundColor)
+		"  $headReference" | New-PromptText -ForegroundColor Black -BackgroundColor (Get-PromptStatusBackgroundColor)
 	} catch {}
 }
 
 function Write-PromptPath {
-	"$(Get-PromptShortPath -Path (Get-Location))" | New-PromptText
+	"📁 $(Get-PromptShortPath -Path (Get-Location))" | New-PromptText
 }
 
 function Write-PromptPythonVenv {
 	if ($Env:VIRTUAL_ENV) {
 		$venvName = $Env:VIRTUAL_ENV -split '\\' | Select-Object -Last 1
-		"$venvName &#128013;" | New-PromptText -ForegroundColor Black -BackgroundColor Blue
+		"&#128013; $venvName" | New-PromptText -ForegroundColor Black -BackgroundColor Blue
 	}
 }

@@ -8,12 +8,14 @@
   autocrlf = true
   editor = code --wait
   ignorecase = true
+	longpaths = true
 [alias]
-  compare-log = log --oneline --left-right --name-only --no-merges
-  author-log = log --pretty=format:\"%C(yellow)%h %C(black)%G? %<(12,trunc)%C(cyan)%an %<(12,trunc)%C(green)%ar%>(1)%C(auto)%d%Creset%s\" --no-merges
+  clog = log --oneline --left-right --name-only --no-merges
+  flog = log --pretty=format:\"%C(yellow)%h %C(black)%G? %<(12,trunc)%C(cyan)%an %<(12,trunc)%C(green)%ar%>(1)%C(auto)%d%Creset%s\" --no-merges
   can = commit --amend --no-edit
   ca = commit --amend
   pushu = "!git push -u origin \"$(git rev-parse --abbrev-ref HEAD)\""
+  difft = "!git difftool -yx 'code --diff --wait'"
 [push]
   default = simple
 [credential]
@@ -23,7 +25,9 @@
 [gpg]
   program = C:\\Program Files (x86)\\GnuPG\\bin\\gpg.exe
 [diff]
-  tool = "vim -d"
+  tool = vscode
+[difftool "vscode"]
+  cmd = code --wait --diff $LOCAL $REMOTE
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
