@@ -76,13 +76,15 @@ function Set-AwsDefaultSession {
 		function Convert-SessionToConvention {
 			param($SessionName, $SessionExtension)
 			switch ($SessionName) {
-				"Corp$SessionExtension" { "mfa" }
+				"Corp$SessionExtension" { "mfa,admin" }
 				"CorpSandbox$SessionExtension" { "sandbox" }
+				"CorpGalileo$SessionExtension" { "galileo" }
 				"Pep$SessionExtension" { "pep" }
 			}
 		}
 
 		function Set-EnvironmentFromToken {
+			[CmdletBinding()]
 			param(
 				[Parameter(Mandatory)]
 				[Amazon.SecurityToken.Model.Credentials] $Token,
@@ -101,14 +103,16 @@ function Set-AwsDefaultSession {
 				-SessionToken $Token.SessionToken `
 				-StoreAs $SessionName `
 				-ProfileLocation $HOME\.aws\credentials
-			if ($convertedSession = Convert-SessionToConvention -SessionName $SessionName -SessionExtension $SessionExtension) {
-				Write-Verbose "Setting conventional profile '$convertedSession'"
-				Set-AWSCredential `
-					-AccessKey $Token.AccessKeyId `
-					-SecretKey $Token.SecretAccessKey `
-					-SessionToken $Token.SessionToken `
-					-StoreAs $convertedSession `
-					-ProfileLocation $HOME\.aws\credentials
+			if ($convertedSessions = Convert-SessionToConvention -SessionName $SessionName -SessionExtension $SessionExtension) {
+				Write-Verbose "Setting conventional profiles '$convertedSessions'"
+				$convertedSessions -split "," | %{
+					Set-AWSCredential `
+						-AccessKey $Token.AccessKeyId `
+						-SecretKey $Token.SecretAccessKey `
+						-SessionToken $Token.SessionToken `
+						-StoreAs $_ `
+						-ProfileLocation $HOME\.aws\credentials
+				}
 			}
 			Set-AWSCredential -ProfileName $SessionName -Scope Global
 			Set-PromptColor -ProfileName $SessionName -SessionExtension $SessionExtension
@@ -171,6 +175,7 @@ function Set-AwsDefaultSession {
 		}
 
 		function Start-NewSession {
+			[CmdletBinding()]
 			param(
 				[Parameter(Mandatory)]
 				[ValidateSet("Corp", "Pep")]
