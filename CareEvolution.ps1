@@ -17,3 +17,6 @@ if ( Test-Path $Home\CeServers.json ){
 Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | %{
 	. $_.FullName
 }
+
+Set-Alias tf terraform
+Set-Alias tg terragrunt
