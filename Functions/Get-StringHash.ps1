@@ -7,9 +7,7 @@ function Get-StringHash {
 		[ValidateSet("MD5", "SHA1", "SHA256", "SHA512")]
 		[string] $HashName = "MD5"
 	)
-	$StringBuilder = New-Object System.Text.StringBuilder
-	[System.Security.Cryptography.HashAlgorithm]::Create( $HashName ).ComputeHash( [System.Text.Encoding]::UTF8.GetBytes( $String ) ) | %{
-		[Void]$StringBuilder.Append( $_.ToString( "x2" ) )
-	}
-	$StringBuilder.ToString()
+	$algorithm = [System.Security.Cryptography.HashAlgorithm]::Create( $HashName )
+	$hashed = $algorithm.ComputeHash( [System.Text.Encoding]::UTF8.GetBytes( $String ) )
+	[System.Convert]::ToHexString($hashed).ToLower()
 }
