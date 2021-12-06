@@ -30,5 +30,7 @@ Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | %{
 	. $_.FullName
 }
 
+Set-ProgetEnvironment
+
 Set-Alias tf terraform
 Set-Alias tg terragrunt

@@ -12,3 +12,5 @@ if ( Test-Path $Home\CeServers.json ){
 Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | %{
 	. $_.FullName
 }
+
+Set-ProgetEnvironment
