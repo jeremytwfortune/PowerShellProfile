@@ -53,7 +53,7 @@ if ( $Machine -in ("Work", "Home") ) {
 		f.lux.install `
 		rainmeter `
 		windirstat `
-		greenshot `
+		sharex `
 		slack `
 		gimp `
 		licecap `
