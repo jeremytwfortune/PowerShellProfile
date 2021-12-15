@@ -1,7 +1,7 @@
-function Copy-CePepPasswordToClipboard {
+function Copy-CeHostedPasswordToClipboard {
 	Get-Secret "Hosted" |
 		ConvertFrom-SecureString -AsPlainText |
 		Set-Clipboard
 }
 
-Set-Alias hpw Copy-CePepPasswordToClipboard
+Set-Alias hpw Copy-CeHostedPasswordToClipboard
