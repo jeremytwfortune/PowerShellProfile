@@ -6,15 +6,17 @@ function Build-PipenvLockfile {
 	)
 
 	$buildServerEnvironment = "export PROGET_USERNAME='buildserver'; export PROGET_PASSWORD='${Env:PROGET_PASSWORD}'"
+	$removeEnvironment = "$buildServerEnvironment; python3 -m pipenv --rm"
+	$cleanEnvironment = "$buildServerEnvironment; python3 -m pipenv clean"
 	$initialGeneration = "$buildServerEnvironment; python3 -m pipenv install --dev"
 	$lock = "$buildServerEnvironment; python3 -m pipenv lock --dev --keep-outdated"
 
 	Push-Location $Directory
 	try {
 		if ($DestroyEnvironment) {
-			bash -c "python3 -m pipenv --rm"
+			bash -c $removeEnvironment
 		} else {
-			bash -c "python3 -m pipenv clean"
+			bash -c $cleanEnvironment
 		}
 		bash -c $initialGeneration
 
