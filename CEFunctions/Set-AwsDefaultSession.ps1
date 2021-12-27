@@ -79,6 +79,9 @@ function Set-AwsDefaultSession {
 				"Corp$SessionExtension" { "mfa,admin" }
 				"CorpSandbox$SessionExtension" { "sandbox" }
 				"CorpGalileo$SessionExtension" { "galileo" }
+				"CorpInfrastructure$SessionExtension" { "infrastructure" }
+				"CorpPublicInfrastructure$SessionExtension" { "public-infrastructure" }
+				"CorpTenantGroup$SessionExtension" { "tg" }
 				"Pep$SessionExtension" { "pep" }
 			}
 		}
