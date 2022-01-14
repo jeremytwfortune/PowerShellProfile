@@ -20,6 +20,9 @@ $Global:Ge2cDeployment = @{
 	TenantGroupProd = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\environments\prod\deployments\tenantgroupprod"
 	VidantProd = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\environments\prod\deployments\vidantprod"
 	CamdenHie = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\environments\prod\deployments\camdenhie"
+	CloverExternal = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\client-datamarts\clover"
+	NjExternal = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\client-datamarts\nj"
+	VidantExternal = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\client-datamarts\vidant"
 }
 
 if ( Test-Path $Home\CeServers.json ){
