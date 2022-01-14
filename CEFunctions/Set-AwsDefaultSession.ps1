@@ -35,7 +35,7 @@ function Set-AwsDefaultSession {
 		$parameterDictionary
 	}
 	end {
-		function Clear-AwsDefaultSession {
+		function Initialize-AwsDefaultSession {
 			param(
 				[Parameter(Mandatory)]
 				[ValidateSet("Corp", "Pep")]
@@ -58,6 +58,7 @@ function Set-AwsDefaultSession {
 						-ProfileLocation $HOME\.aws\credentials
 			}
 			Set-AWSCredential -ProfileName $Environment -Scope Global
+			$Env:AWS_PROFILE = $Environment
 		}
 
 		function Set-PromptColor {
@@ -118,6 +119,7 @@ function Set-AwsDefaultSession {
 				}
 			}
 			Set-AWSCredential -ProfileName $SessionName -Scope Global
+			$Env:AWS_PROFILE = $SessionName
 			Set-PromptColor -ProfileName $SessionName -SessionExtension $SessionExtension
 		}
 
@@ -193,7 +195,7 @@ function Set-AwsDefaultSession {
 				[string] $RoleName
 			)
 
-			Clear-AWSDefaultSession $Environment
+			Initialize-AWSDefaultSession $Environment
 
 			if (-Not (Test-ExistingSession -ProfileName "${Environment}$SessionExtension")) {
 				$serialNumber = Get-MfaSerialNumber -Environment $Environment
@@ -229,6 +231,7 @@ function Set-AwsDefaultSession {
 			Write-Verbose "Found existing valid session for '$ProfileName'"
 			Set-PromptColor -ProfileName $ProfileName -SessionExtension $SESSION_EXTENSION
 			Set-AWSCredential -ProfileName $ProfileName -Scope Global
+			$Env:AWS_PROFILE = $ProfileName
 			return
 		}
 
