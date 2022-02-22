@@ -6,13 +6,14 @@ function Build-PipenvLockfile {
 	)
 
 	$buildServerEnvironment = "export PROGET_USERNAME='buildserver'; export PROGET_PASSWORD='${Env:PROGET_PASSWORD}'"
-	$removeEnvironment = "$buildServerEnvironment; python3 -m pipenv --rm"
-	$cleanEnvironment = "$buildServerEnvironment; python3 -m pipenv clean"
-	$initialGeneration = "$buildServerEnvironment; python3 -m pipenv install --dev"
-	$lock = "$buildServerEnvironment; python3 -m pipenv lock --dev --keep-outdated"
+	$removeEnvironment = "$buildServerEnvironment; pipenv --rm"
+	$cleanEnvironment = "$buildServerEnvironment; pipenv clean"
+	$initialGeneration = "$buildServerEnvironment; pipenv install --dev"
+	$lock = "$buildServerEnvironment; pipenv lock --dev --keep-outdated"
 
 	Push-Location $Directory
 	try {
+		Write-Verbose "Installing linux"
 		if ($DestroyEnvironment) {
 			bash -c $removeEnvironment
 		} else {
@@ -20,6 +21,7 @@ function Build-PipenvLockfile {
 		}
 		bash -c $initialGeneration
 
+		Write-Verbose "Installing windows with --keep-outdated"
 		if ($DestroyEnvironment) {
 			pipenv --rm
 		} else {
@@ -27,6 +29,7 @@ function Build-PipenvLockfile {
 		}
 		pipenv install --dev --keep-outdated
 
+		Write-Verbose "Locking linux"
 		bash -c $lock
 	} finally {
 		Pop-Location
