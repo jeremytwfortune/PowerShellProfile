@@ -19,14 +19,24 @@ function Switch-AwsApiKey {
 
 	$currentSecret = Get-Secret -Name $SECRET_NAME
 	if (-not (Test-AwsContainsKey $currentSecret.UserName)) {
-		throw "Listed access keys do not contain the new key $($currentSecret.UserName)"
+		throw "Listed access keys do not contain the current key $($currentSecret.UserName)"
 	}
 
 	$newKey = New-IAMAccessKey
 	Write-Verbose "Replacing $($currentSecret.UserName) with $($newKey.AccessKeyId)"
 	$newSecretAccessKey = ConvertTo-SecureString $newKey.SecretAccessKey -AsPlainText -Force
-	$newSecret = New-Object System.Management.Automation.PSCredential($newKey.AccessKeyId, $newSecretAccessKey)
-	Set-Secret -Name $SECRET_NAME -Secret $newSecret
+
+	try {
+		$Env:OP_SESSION_careevolution = Get-Secret "1Password" |
+			ConvertFrom-SecureString -AsPlainText |
+			op signin careevolution --raw
+	} catch {
+		throw "Unable to read from op; Key $($newKey.AccessKeyId) has not been synced and should be removed."
+	}
+
+	op edit item "AWS $Environment Access Key" username=$($newKey.AccessKeyId) credential=$newSecretAccessKey --vault "Private"
+
+	Set-LocalKeyChain
 
 	if (-not (Test-AwsContainsKey $newKey.AccessKeyId)) {
 		throw "Listed access keys do not contain the new key $($newKey.AccessKeyId)"

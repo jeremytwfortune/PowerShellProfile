@@ -1,6 +1,6 @@
 param (
 	[ValidateSet("Home", "Work", "WorkSpace")]
-	$Work
+	$Machine
 )
 
 Set-ExecutionPolicy Bypass; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
