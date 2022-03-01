@@ -26,11 +26,7 @@ function Switch-AwsApiKey {
 	Write-Verbose "Replacing $($currentSecret.UserName) with $($newKey.AccessKeyId)"
 	$newSecretAccessKey = ConvertTo-SecureString $newKey.SecretAccessKey -AsPlainText -Force
 
-	try {
-		$Env:OP_SESSION_careevolution = Get-Secret "1Password" |
-			ConvertFrom-SecureString -AsPlainText |
-			op signin careevolution --raw
-	} catch {
+	if (-not (Connect-OnePassword)) {
 		throw "Unable to read from op; Key $($newKey.AccessKeyId) has not been synced and should be removed."
 	}
 

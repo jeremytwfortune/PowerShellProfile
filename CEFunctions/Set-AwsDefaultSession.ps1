@@ -166,9 +166,7 @@ function Set-AwsDefaultSession {
 			}
 
 			try {
-				$Env:OP_SESSION_careevolution = Get-Secret "1Password" |
-					ConvertFrom-SecureString -AsPlainText |
-					op signin careevolution --raw
+				Connect-OnePassword
 				$totp = op get totp $totpMap[$Environment]
 			}
 			catch {

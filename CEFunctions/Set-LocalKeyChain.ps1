@@ -2,11 +2,7 @@ function Set-LocalKeyChain {
 	[CmdletBinding()]
 	param()
 
-	try {
-		$Env:OP_SESSION_careevolution = Get-Secret "1Password" |
-			ConvertFrom-SecureString -AsPlainText |
-			op signin careevolution --raw
-	} catch {
+	if (-not (Connect-OnePassword)) {
 		throw "Unable to read from op"
 	}
 
