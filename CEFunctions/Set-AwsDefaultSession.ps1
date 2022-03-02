@@ -166,11 +166,10 @@ function Set-AwsDefaultSession {
 			}
 
 			try {
-				Connect-OnePassword
+				Connect-OnePassword | Out-Null
 				$totp = op get totp $totpMap[$Environment]
 			}
-			catch {
-			}
+			catch {}
 			if ($totp) {
 				return $totp
 			}
