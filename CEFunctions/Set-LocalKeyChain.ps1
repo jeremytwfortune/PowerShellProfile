@@ -39,7 +39,7 @@ function Set-LocalKeyChain {
 
 		Write-Verbose "Setting secret '$($login.Key)' from op '$($login.Value)'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
-		Set-Secret -Name $apiCredential.Key -Secret $secretCredential
+		Set-Secret -Name $login.Key -Secret $secretCredential
 	}
 
 

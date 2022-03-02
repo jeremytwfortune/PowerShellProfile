@@ -24,13 +24,12 @@ function Switch-AwsApiKey {
 
 	$newKey = New-IAMAccessKey
 	Write-Verbose "Replacing $($currentSecret.UserName) with $($newKey.AccessKeyId)"
-	$newSecretAccessKey = ConvertTo-SecureString $newKey.SecretAccessKey -AsPlainText -Force
 
 	if (-not (Connect-OnePassword)) {
 		throw "Unable to read from op; Key $($newKey.AccessKeyId) has not been synced and should be removed."
 	}
 
-	op edit item "AWS $Environment Access Key" username=$($newKey.AccessKeyId) credential=$newSecretAccessKey --vault "Private"
+	op edit item "AWS $Environment Access Key" username=$newKey.AccessKeyId credential=$newKey.SecretAccessKey --vault "Private"
 
 	Set-LocalKeyChain
 
