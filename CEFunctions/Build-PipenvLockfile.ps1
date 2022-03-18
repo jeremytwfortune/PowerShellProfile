@@ -5,11 +5,12 @@ function Build-PipenvLockfile {
 		[switch] $DestroyEnvironment
 	)
 
+	$verboseFlag = if ($PSBoundParameters.Verbose) {"-v"} else {""}
 	$buildServerEnvironment = "export PROGET_USERNAME='buildserver'; export PROGET_PASSWORD='${Env:PROGET_PASSWORD}'"
-	$removeEnvironment = "$buildServerEnvironment; python3 -m pipenv --rm"
-	$cleanEnvironment = "$buildServerEnvironment; python3 -m pipenv clean"
-	$initialGeneration = "$buildServerEnvironment; python3 -m pipenv install --dev"
-	$lock = "$buildServerEnvironment; python3 -m pipenv lock --dev --keep-outdated"
+	$removeEnvironment = "$buildServerEnvironment; python3 -m pipenv $verboseFlag --rm"
+	$cleanEnvironment = "$buildServerEnvironment; python3 -m pipenv $verboseFlag clean"
+	$initialGeneration = "$buildServerEnvironment; python3 -m pipenv install $verboseFlag --dev"
+	$lock = "$buildServerEnvironment; python3 -m pipenv lock $verboseFlag --dev --keep-outdated"
 
 	Push-Location $Directory
 	try {
