@@ -17,11 +17,7 @@ Get-ChildItem "$(Split-Path $PROFILE)\Functions" | %{
 	. $_.FullName
 }
 
-$Global:SecretKeys = @()
-$Global:CredentialStore = @{ Tokens = @{} }
-if ( $oAuthCredential = Get-Secret -Name "api.github.com/oauth" -AsPlainText ) {
-	$Global:CredentialStore.Tokens.GitHubOAuthToken = $oAuthCredential
-}
+$Global:CredentialStore = @{}
 
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
 

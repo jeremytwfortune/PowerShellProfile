@@ -1,6 +1,6 @@
 param (
 	[ValidateSet("Home", "Work", "WorkSpace")]
-	$Work
+	$Machine
 )
 
 Set-ExecutionPolicy Bypass; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
@@ -53,7 +53,7 @@ if ( $Machine -in ("Work", "Home") ) {
 		f.lux.install `
 		rainmeter `
 		windirstat `
-		greenshot `
+		sharex `
 		slack `
 		gimp `
 		licecap `
