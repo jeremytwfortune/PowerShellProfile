@@ -13,12 +13,12 @@ function Set-LocalKeyChain {
 	}
 
 	foreach ($onlyPassword in $onlyPasswords.GetEnumerator()) {
-		$entry = op get item $onlyPassword.Value --vault "Private" | ConvertFrom-Json
+		$entry = op item get $onlyPassword.Value --vault "Private" --format json | ConvertFrom-Json
 		if (-not $entry) {
 			throw "Cannot retrieve $($onlyPassword.Value)"
 		}
-		$fields = $entry.details.fields
-		$password = $fields | Where-Object { $_.designation -eq "password" } | Select-Object -ExpandProperty Value
+		$fields = $entry.fields
+		$password = $fields | Where-Object { $_.purpose -eq "password" } | Select-Object -ExpandProperty Value
 
 		Write-Verbose "Setting secret '$($onlyPassword.Key)' from op '$($onlyPassword.Value)'"
 		Set-Secret -Name $onlyPassword.Key -SecureStringSecret ($password | ConvertTo-SecureString -AsPlainText)
@@ -29,13 +29,13 @@ function Set-LocalKeyChain {
 	}
 
 	foreach ($login in $logins.GetEnumerator()) {
-		$entry = op get item $login.Value | ConvertFrom-Json
+		$entry = op item get $login.Value --vault "CareEvolution.Infrastructure" --format json | ConvertFrom-Json
 		if (-not $entry) {
 			throw "Cannot retrieve $($login.Value)"
 		}
-		$fields = $entry.details.fields
-		$username = $fields | Where-Object { $_.designation -eq "username" } | Select-Object -ExpandProperty Value
-		$password = $fields | Where-Object { $_.designation -eq "password" } | Select-Object -ExpandProperty Value
+		$fields = $entry.fields
+		$username = $fields | Where-Object { $_.purpose -eq "username" } | Select-Object -ExpandProperty Value
+		$password = $fields | Where-Object { $_.purpose -eq "password" } | Select-Object -ExpandProperty Value
 
 		Write-Verbose "Setting secret '$($login.Key)' from op '$($login.Value)'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
@@ -49,13 +49,13 @@ function Set-LocalKeyChain {
 	}
 
 	foreach ($apiCredential in $apiCredentials.GetEnumerator()) {
-		$entry = op get item $apiCredential.Value --vault "Private" | ConvertFrom-Json
+		$entry = op item get $apiCredential.Value --vault "Private" --format json | ConvertFrom-Json
 		if (-not $entry) {
 			throw "Cannot retrieve $($apiCredential.Value)"
 		}
-		$fields = $entry.details.sections.fields
-		$username = $fields | Where-Object { $_.n -eq "username" } | Select-Object -ExpandProperty v
-		$credential = $fields | Where-Object { $_.n -eq "credential" } | Select-Object -ExpandProperty v
+		$fields = $entry.fields
+		$username = $fields | Where-Object { $_.id -eq "username" } | Select-Object -ExpandProperty value
+		$credential = $fields | Where-Object { $_.id -eq "credential" } | Select-Object -ExpandProperty value
 
 		Write-Verbose "Setting secret '$($apiCredential.Key)' from op '$($apiCredential.Value)'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($credential | ConvertTo-SecureString -AsPlainText)

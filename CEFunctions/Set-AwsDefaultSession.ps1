@@ -4,7 +4,7 @@ function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
-		[ValidateSet("Corp", "Pep", IgnoreCase=$False)]
+		[ValidateSet("Corp", "Pep", IgnoreCase = $False)]
 		[string] $Environment
 	)
 	dynamicparam {
@@ -50,12 +50,12 @@ function Set-AwsDefaultSession {
 			Write-Verbose "Loading profile from credentials file"
 			$storedCredential = Get-AWSCredential -ProfileName $Environment
 			if ($awsCredential -And (-Not ($storedCredential) -Or $storedCredential.GetCredentials().AccessKey -Ne $awsCredential.UserName)) {
-					Write-Verbose "Credentials file contains a different access key, updating file"
-					Set-AWSCredential `
-						-AccessKey $awsCredential.UserName `
-						-SecretKey $awsCredential.GetNetworkCredential().Password `
-						-StoreAs $Environment `
-						-ProfileLocation $HOME\.aws\credentials
+				Write-Verbose "Credentials file contains a different access key, updating file"
+				Set-AWSCredential `
+					-AccessKey $awsCredential.UserName `
+					-SecretKey $awsCredential.GetNetworkCredential().Password `
+					-StoreAs $Environment `
+					-ProfileLocation $HOME\.aws\credentials
 			}
 			Set-AWSCredential -ProfileName $Environment -Scope Global
 			$Env:AWS_PROFILE = $Environment
@@ -109,7 +109,7 @@ function Set-AwsDefaultSession {
 				-ProfileLocation $HOME\.aws\credentials
 			if ($convertedSessions = Convert-SessionToConvention -SessionName $SessionName -SessionExtension $SessionExtension) {
 				Write-Verbose "Setting conventional profiles '$convertedSessions'"
-				$convertedSessions -split "," | %{
+				$convertedSessions -split "," | % {
 					Set-AWSCredential `
 						-AccessKey $Token.AccessKeyId `
 						-SecretKey $Token.SecretAccessKey `
@@ -149,7 +149,8 @@ function Set-AwsDefaultSession {
 				if ($sts) {
 					return $True
 				}
-			} catch {}
+			}
+			catch {}
 			$False
 		}
 
@@ -167,7 +168,7 @@ function Set-AwsDefaultSession {
 
 			try {
 				Connect-OnePassword | Out-Null
-				$totp = op get totp $totpMap[$Environment]
+				$totp = op item get $totpMap[$Environment] --otp
 			}
 			catch {}
 			if ($totp) {
