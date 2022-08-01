@@ -6,48 +6,70 @@ function Set-LocalKeyChain {
 		throw "Unable to read from op"
 	}
 
-	$onlyPasswords = @{
-		Corp = "Corp AD"
-		Pep = "Pep AD"
-		Hosted = "Hosted AD"
-	}
+	function Convert-Injectable {
+		param(
+			[Parameter(ValueFromPipeline)]
+			$InputObject
+		)
 
-	foreach ($onlyPassword in $onlyPasswords.GetEnumerator()) {
-		$password = "op://Private/$($onlyPassword.Value)/password" | op inject
-		if (-not $password) {
-			throw "Cannot retrieve $($onlyPassword.Value)"
+		process {
+			$InputObject |
+				ConvertTo-Json -Compress |
+				op inject |
+				ConvertFrom-Json
 		}
-
-		Write-Verbose "Setting secret '$($onlyPassword.Key)' from op '$($onlyPassword.Value)'"
-		Set-Secret -Name $onlyPassword.Key -SecureStringSecret ($password | ConvertTo-SecureString -AsPlainText)
 	}
 
+	$onlyPasswords = @{
+		Corp = @{
+			Password = "op://Private/Corp AD/password"
+		}
+		Pep = @{
+			Password = "op://Private/Pep AD/password"
+		}
+		Hosted = @{
+			Password = "op://Private/Hosted AD/password"
+		}
+	} | Convert-Injectable
 
-	$username = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/username" | op inject
-	$password = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/password" | op inject
-
-	if ((-not $username) -or (-not $password)) {
-		throw "Cannot retrieve $($login.Value)"
+	foreach ($onlyPassword in $onlyPasswords | Get-Member | Where-Object MemberType -EQ "NoteProperty" | Select-Object -ExpandProperty Name) {
+		Write-Verbose "Setting secret '$onlyPassword' from op"
+		$password = $onlyPasswords.$onlyPassword.Password
+		Set-Secret -Name $onlyPassword -SecureStringSecret ($password | ConvertTo-SecureString -AsPlainText)
 	}
-	Write-Verbose "Setting secret 'BuildServer' from op 'buildserver@corp'"
-	$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
-	Set-Secret -Name "BuildServer" -Secret $secretCredential
+
+	$logins = @{
+		BuildServer = @{
+			Username = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/username"
+			Password = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/password"
+		}
+	} | Convert-Injectable
+
+	foreach ($login in $logins | Get-Member | Where-Object MemberType -EQ "NoteProperty" | Select-Object -ExpandProperty Name) {
+		$username = $logins.$login.Username
+		$password = $logins.$login.Password
+		Write-Verbose "Setting secret '$login' from op '$username'"
+		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
+		Set-Secret -Name $login -Secret $secretCredential
+	}
 
 
 	$apiCredentials = @{
-		"aws.amazon.com/iam/corp" = "AWS Corp Access Key"
-		"aws.amazon.com/iam/pep" = "AWS Pep Access Key"
-	}
-
-	foreach ($apiCredential in $apiCredentials.GetEnumerator()) {
-		$username = "op://Private/$($apiCredential.Value)/username" | op inject
-		$credential = "op://Private/$($apiCredential.Value)/credential" | op inject
-		if ((-not $username) -or (-not $credential)) {
-			throw "Cannot retrieve $($apiCredential.Value)"
+		"aws.amazon.com/iam/corp" = @{
+			Username = "op://Private/AWS Corp Access Key/username"
+			Credential = "op://Private/AWS Corp Access Key/credential"
 		}
+		"aws.amazon.com/iam/pep" = @{
+			Username = "op://Private/AWS Pep Access Key/username"
+			Credential = "op://Private/AWS Pep Access Key/credential"
+		}
+	} | Convert-Injectable
 
-		Write-Verbose "Setting secret '$($apiCredential.Key)' from op '$($apiCredential.Value)'"
+	foreach ($apiCredential in $apiCredentials | Get-Member | Where-Object MemberType -EQ "NoteProperty" | Select-Object -ExpandProperty Name) {
+		$username = $apiCredentials.$apiCredential.Username
+		$credential = $apiCredentials.$apiCredential.Credential
+		Write-Verbose "Setting secret '$apiCredential' from op '$username'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($credential | ConvertTo-SecureString -AsPlainText)
-		Set-Secret -Name $apiCredential.Key -Secret $secretCredential
+		Set-Secret -Name $apiCredential -Secret $secretCredential
 	}
 }
