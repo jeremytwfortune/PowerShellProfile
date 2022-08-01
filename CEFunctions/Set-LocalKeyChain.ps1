@@ -13,34 +13,25 @@ function Set-LocalKeyChain {
 	}
 
 	foreach ($onlyPassword in $onlyPasswords.GetEnumerator()) {
-		$entry = op item get $onlyPassword.Value --vault "Private" --format json | ConvertFrom-Json
-		if (-not $entry) {
+		$password = "op://Private/$($onlyPassword.Value)/password" | op inject
+		if (-not $password) {
 			throw "Cannot retrieve $($onlyPassword.Value)"
 		}
-		$fields = $entry.fields
-		$password = $fields | Where-Object { $_.purpose -eq "password" } | Select-Object -ExpandProperty Value
 
 		Write-Verbose "Setting secret '$($onlyPassword.Key)' from op '$($onlyPassword.Value)'"
 		Set-Secret -Name $onlyPassword.Key -SecureStringSecret ($password | ConvertTo-SecureString -AsPlainText)
 	}
 
-	$logins = @{
-		BuildServer = "buildserver@corp"
-	}
 
-	foreach ($login in $logins.GetEnumerator()) {
-		$entry = op item get $login.Value --vault "CareEvolution.Infrastructure" --format json | ConvertFrom-Json
-		if (-not $entry) {
-			throw "Cannot retrieve $($login.Value)"
-		}
-		$fields = $entry.fields
-		$username = $fields | Where-Object { $_.purpose -eq "username" } | Select-Object -ExpandProperty Value
-		$password = $fields | Where-Object { $_.purpose -eq "password" } | Select-Object -ExpandProperty Value
+	$username = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/username" | op inject
+	$password = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/password" | op inject
 
-		Write-Verbose "Setting secret '$($login.Key)' from op '$($login.Value)'"
-		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
-		Set-Secret -Name $login.Key -Secret $secretCredential
+	if ((-not $username) -or (-not $password)) {
+		throw "Cannot retrieve $($login.Value)"
 	}
+	Write-Verbose "Setting secret 'BuildServer' from op 'buildserver@corp'"
+	$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
+	Set-Secret -Name "BuildServer" -Secret $secretCredential
 
 
 	$apiCredentials = @{
@@ -49,13 +40,11 @@ function Set-LocalKeyChain {
 	}
 
 	foreach ($apiCredential in $apiCredentials.GetEnumerator()) {
-		$entry = op item get $apiCredential.Value --vault "Private" --format json | ConvertFrom-Json
-		if (-not $entry) {
+		$username = "op://Private/$($apiCredential.Value)/username" | op inject
+		$credential = "op://Private/$($apiCredential.Value)/credential" | op inject
+		if ((-not $username) -or (-not $credential)) {
 			throw "Cannot retrieve $($apiCredential.Value)"
 		}
-		$fields = $entry.fields
-		$username = $fields | Where-Object { $_.id -eq "username" } | Select-Object -ExpandProperty value
-		$credential = $fields | Where-Object { $_.id -eq "credential" } | Select-Object -ExpandProperty value
 
 		Write-Verbose "Setting secret '$($apiCredential.Key)' from op '$($apiCredential.Value)'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($credential | ConvertTo-SecureString -AsPlainText)
