@@ -77,7 +77,8 @@ function Set-AwsDefaultSession {
 		function Convert-SessionToConvention {
 			param($SessionName, $SessionExtension)
 			switch ($SessionName) {
-				"Corp$SessionExtension" { "mfa,admin" }
+				"Corp$SessionExtension" { "mfa" }
+				"CorpAdmin$SessionExtension" { "admin" }
 				"CorpSandbox$SessionExtension" { "sandbox" }
 				"CorpGalileo$SessionExtension" { "galileo" }
 				"CorpInfrastructure$SessionExtension" { "infrastructure" }
