@@ -4,36 +4,8 @@ function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory, Position = 0)]
-		[ValidateSet("Corp", "Pep", IgnoreCase = $False)]
-		[string] $Environment
+		[string] $ProfileName
 	)
-	dynamicparam {
-		$roleParameterName = "RoleName"
-		$locationData = "$Home\AwsAssumableRoles.txt"
-		if ( -Not ( Test-Path $locationData -ErrorAction SilentlyContinue ) ) {
-			throw "File '$locationData' cannot be found"
-		}
-		$roleNames = Get-Content $locationData | ConvertFrom-StringData
-
-		$attributeList = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
-		$attributeValidateSet = New-Object System.Management.Automation.ValidateSetAttribute($roleNames.Keys)
-		$attributeList.Add($attributeValidateSet)
-
-		$attributeParameter = New-Object System.Management.Automation.ParameterAttribute
-		$attributeParameter.Mandatory = $False
-		$attributeParameter.Position = 2
-		$attributeList.Add($attributeParameter)
-
-		$parameter = New-Object System.Management.Automation.RuntimeDefinedParameter(
-			$roleParameterName,
-			[string],
-			$attributeList
-		)
-
-		$parameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
-		$parameterDictionary.Add($roleParameterName, $parameter)
-		$parameterDictionary
-	}
 	end {
 		function Initialize-AwsDefaultSession {
 			param(
@@ -61,29 +33,9 @@ function Set-AwsDefaultSession {
 			$Env:AWS_PROFILE = $Environment
 		}
 
-		function Set-PromptColor {
-			param($ProfileName, $SessionExtension)
-
-			$Global:StoredAWSCredentialPromptColor = switch ($ProfileName) {
-				"Corp" { "White" }
-				"Pep" { "White" }
-				"Corp$SessionExtension" { "Green" }
-				"CorpSandbox$SessionExtension" { "Blue" }
-				"CorpGalileo$SessionExtension" { "Magenta" }
-				"Pep$SessionExtension" { "DarkRed" }
-			}
-		}
-
 		function Convert-SessionToConvention {
 			param($SessionName, $SessionExtension)
 			switch ($SessionName) {
-				"Corp$SessionExtension" { "mfa" }
-				"CorpAdmin$SessionExtension" { "admin" }
-				"CorpSandbox$SessionExtension" { "sandbox" }
-				"CorpGalileo$SessionExtension" { "galileo" }
-				"CorpInfrastructure$SessionExtension" { "infrastructure" }
-				"CorpPublicInfrastructure$SessionExtension" { "public-infrastructure" }
-				"CorpTenantGroup$SessionExtension" { "tg" }
 				"Pep$SessionExtension" { "pep" }
 			}
 		}
@@ -121,7 +73,6 @@ function Set-AwsDefaultSession {
 			}
 			Set-AWSCredential -ProfileName $SessionName -Scope Global
 			$Env:AWS_PROFILE = $SessionName
-			Set-PromptColor -ProfileName $SessionName -SessionExtension $SessionExtension
 		}
 
 		function Get-MfaSerialNumber {
@@ -196,49 +147,50 @@ function Set-AwsDefaultSession {
 
 			Initialize-AWSDefaultSession $Environment
 
-			if (-Not (Test-ExistingSession -ProfileName "${Environment}$SessionExtension")) {
-				$serialNumber = Get-MfaSerialNumber -Environment $Environment
-				$tokenCode = Read-TokenCode -Environment $Environment
-				$stsSessionToken = Get-STSSessionToken -SerialNumber $serialNumber -TokenCode $tokenCode -DurationInSeconds 43200
-				Set-EnvironmentFromToken `
-					-Token $stsSessionToken `
-					-SessionName "${Environment}$SessionExtension" `
-					-SessionExtension $SessionExtension
+			if (Test-ExistingSession -ProfileName "${Environment}$SessionExtension") {
+				return
 			}
 
-			if (-Not $RoleName) { return }
-
-			$roleArn = $roleNames.$RoleName
-			Write-Verbose "Assuming role arn '$roleArn' under role name '$RoleName'"
-			$stsRole = Use-STSRole `
-				-RoleArn $roleArn `
-				-ProfileName "${Environment}$SessionExtension" `
-				-RoleSessionName $profileName
+			$serialNumber = Get-MfaSerialNumber -Environment $Environment
+			$tokenCode = Read-TokenCode -Environment $Environment
+			$stsSessionToken = Get-STSSessionToken -SerialNumber $serialNumber -TokenCode $tokenCode -DurationInSeconds 43200
 			Set-EnvironmentFromToken `
-				-Token $stsRole.Credentials `
-				-SessionName $profileName `
+				-Token $stsSessionToken `
+				-SessionName "${Environment}$SessionExtension" `
 				-SessionExtension $SessionExtension
 		}
 
-
 		$ErrorActionPreference = "Stop"
-		$SESSION_EXTENSION = "Session"
-		$roleName = $PSBoundParameters[$roleParameterName]
-		$profileName = "$Environment$roleName$SESSION_EXTENSION"
+		if ($ProfileName -ieq "pep") {
+			$SESSION_EXTENSION = "Session"
+			$sessionedProfileName = "$ProfileName$SESSION_EXTENSION"
 
-		if (Test-ExistingSession -ProfileName $ProfileName) {
-			Write-Verbose "Found existing valid session for '$ProfileName'"
-			Set-PromptColor -ProfileName $ProfileName -SessionExtension $SESSION_EXTENSION
+			if (Test-ExistingSession -ProfileName $sessionedProfileName) {
+				Write-Verbose "Found existing valid session for '$sessionedProfileName'"
+				Set-AWSCredential -ProfileName $sessionedProfileName -Scope Global
+				$Env:AWS_PROFILE = $sessionedProfileName
+				return
+			}
+
+			Start-NewSession `
+				-Environment $Profile `
+				-ProfileName $sessionedProfileName `
+				-RoleName $roleName `
+				-SessionExtension $SESSION_EXTENSION
+		}
+		else {
+			try {
+				if (-Not (Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue)) {
+					throw "Not logged in"
+				}
+			}
+			catch {
+				Write-Verbose "Logging into SSO"
+				aws sso login --profile $ProfileName
+			}
 			Set-AWSCredential -ProfileName $ProfileName -Scope Global
 			$Env:AWS_PROFILE = $ProfileName
-			return
 		}
-
-		Start-NewSession `
-			-Environment $Environment `
-			-ProfileName $ProfileName `
-			-RoleName $roleName `
-			-SessionExtension $SESSION_EXTENSION
 	}
 }
 

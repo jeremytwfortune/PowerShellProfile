@@ -15,11 +15,13 @@ $Global:Ge2cDeployment = @{
 	VidantExternal = "$Repos\SecurityAndChangeControl\src\aws\galileo\ge2c\client-datamarts\vidant"
 }
 
-if ( Test-Path $Home\CeServers.json ){
+if ( Test-Path $Home\CeServers.json ) {
 	$Global:CeServers = Get-Content $Home\CeServers.json | ConvertFrom-Json
 }
 
-Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | %{
+$Global:StoredAWSCredentialPromptColor = "Magenta"
+
+Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | % {
 	. $_.FullName
 }
 
