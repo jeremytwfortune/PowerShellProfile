@@ -3,14 +3,13 @@
 function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
-		[Parameter(Mandatory, Position = 0)]
+		[Parameter(Mandatory)]
 		[string] $ProfileName
 	)
 	end {
 		function Initialize-AwsDefaultSession {
 			param(
 				[Parameter(Mandatory)]
-				[ValidateSet("Corp", "Pep")]
 				[string] $Environment
 			)
 
@@ -78,7 +77,6 @@ function Set-AwsDefaultSession {
 		function Get-MfaSerialNumber {
 			param(
 				[Parameter(Mandatory)]
-				[ValidateSet("Corp", "Pep")]
 				[string] $Environment
 			)
 
@@ -109,7 +107,6 @@ function Set-AwsDefaultSession {
 		function Read-TokenCode {
 			param(
 				[Parameter(Mandatory)]
-				[ValidateSet("Corp", "Pep")]
 				[string] $Environment
 			)
 
@@ -133,7 +130,6 @@ function Set-AwsDefaultSession {
 			[CmdletBinding()]
 			param(
 				[Parameter(Mandatory)]
-				[ValidateSet("Corp", "Pep")]
 				[string] $Environment,
 
 				[Parameter(Mandatory)]
@@ -173,7 +169,7 @@ function Set-AwsDefaultSession {
 			}
 
 			Start-NewSession `
-				-Environment $Profile `
+				-Environment $ProfileName `
 				-ProfileName $sessionedProfileName `
 				-RoleName $roleName `
 				-SessionExtension $SESSION_EXTENSION

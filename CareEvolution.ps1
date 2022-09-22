@@ -25,5 +25,12 @@ Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | % {
 	. $_.FullName
 }
 
+foreach ($module in "SSO", "SSOOIDC") {
+	$dll = Get-InstalledModule -Name "AWS.Tools.$module" | Select-Object -ExpandProperty InstalledLocation | % { "$_\AWSSDK.${module}.dll" }
+	if ( Test-Path $dll ) {
+		Add-Type -Path $dll
+	}
+}
+
 Set-Alias tf terraform
 Set-Alias tg terragrunt
