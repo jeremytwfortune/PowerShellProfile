@@ -39,6 +39,12 @@ function Set-AwsDefaultSession {
 			}
 		}
 
+		function Set-Profile {
+			param($ProfileName)
+			$Env:AWS_PROFILE = $ProfileName
+			Set-AWSCredential -ProfileName $ProfileName -Scope Global
+		}
+
 		function Set-EnvironmentFromToken {
 			[CmdletBinding()]
 			param(
@@ -70,8 +76,7 @@ function Set-AwsDefaultSession {
 						-ProfileLocation $HOME\.aws\credentials
 				}
 			}
-			Set-AWSCredential -ProfileName $SessionName -Scope Global
-			$Env:AWS_PROFILE = $SessionName
+			Set-Profile $SessionName
 		}
 
 		function Get-MfaSerialNumber {
@@ -163,8 +168,7 @@ function Set-AwsDefaultSession {
 
 			if (Test-ExistingSession -ProfileName $sessionedProfileName) {
 				Write-Verbose "Found existing valid session for '$sessionedProfileName'"
-				Set-AWSCredential -ProfileName $sessionedProfileName -Scope Global
-				$Env:AWS_PROFILE = $sessionedProfileName
+				Set-Profile $sessionedProfileName
 				return
 			}
 
@@ -173,20 +177,28 @@ function Set-AwsDefaultSession {
 				-ProfileName $sessionedProfileName `
 				-RoleName $roleName `
 				-SessionExtension $SESSION_EXTENSION
+			return
 		}
-		else {
-			try {
-				if (-Not (Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue)) {
-					throw "Not logged in"
-				}
+
+		foreach ($module in "SSO", "SSOOIDC") {
+			$dll = Get-InstalledModule -Name "AWS.Tools.$module" |
+				Select-Object -ExpandProperty InstalledLocation |
+				ForEach-Object { "$_\AWSSDK.${module}.dll" }
+			if ( Test-Path $dll ) {
+				Add-Type -Path $dll
 			}
-			catch {
-				Write-Verbose "Logging into SSO"
-				aws sso login --profile $ProfileName
-			}
-			Set-AWSCredential -ProfileName $ProfileName -Scope Global
-			$Env:AWS_PROFILE = $ProfileName
 		}
+
+		try {
+			if (-Not (Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue)) {
+				throw "Not logged in"
+			}
+		}
+		catch {
+			Write-Verbose "Logging into SSO"
+			aws sso login --profile $ProfileName
+		}
+		Set-Profile $ProfileName
 	}
 }
 
