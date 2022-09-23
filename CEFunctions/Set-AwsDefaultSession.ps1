@@ -180,15 +180,6 @@ function Set-AwsDefaultSession {
 			return
 		}
 
-		foreach ($module in "SSO", "SSOOIDC") {
-			$dll = Get-InstalledModule -Name "AWS.Tools.$module" |
-				Select-Object -ExpandProperty InstalledLocation |
-				ForEach-Object { "$_\AWSSDK.${module}.dll" }
-			if ( Test-Path $dll ) {
-				Add-Type -Path $dll
-			}
-		}
-
 		try {
 			if (-Not (Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue)) {
 				throw "Not logged in"
