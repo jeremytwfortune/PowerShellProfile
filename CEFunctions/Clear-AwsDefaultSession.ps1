@@ -6,9 +6,11 @@ function Clear-AwsDefaultSession {
 	Clear-AWSCredential -Scope Global
 	$Env:AWS_PROFILE = $null
 
-	$Env:AWS_DEFAULT_REGION = $null
-	$Env:AWS_REGION = $null
-	Clear-DefaultAWSRegion -Scope Global
+	$defaultRegion = "us-east-1"
+
+	$Env:AWS_DEFAULT_REGION = $defaultRegion
+	$Env:AWS_REGION = $defaultRegion
+	Set-DefaultAWSRegion -Region $defaultRegion -Scope Global
 }
 
 Set-Alias -Name cads -Value Clear-AwsDefaultSession
