@@ -6,20 +6,6 @@ function Set-LocalKeyChain {
 		throw "Unable to read from op"
 	}
 
-	function Convert-Injectable {
-		param(
-			[Parameter(ValueFromPipeline)]
-			$InputObject
-		)
-
-		process {
-			$InputObject |
-				ConvertTo-Json -Compress |
-				op inject |
-				ConvertFrom-Json
-		}
-	}
-
 	$onlyPasswords = @{
 		Corp = @{
 			Password = "op://Private/Corp AD/password"
@@ -30,12 +16,12 @@ function Set-LocalKeyChain {
 		Hosted = @{
 			Password = "op://Private/Hosted AD/password"
 		}
-	} | Convert-Injectable
+	}
 
-	foreach ($onlyPassword in $onlyPasswords | Get-Member | Where-Object MemberType -EQ "NoteProperty" | Select-Object -ExpandProperty Name) {
-		Write-Verbose "Setting secret '$onlyPassword' from op"
-		$password = $onlyPasswords.$onlyPassword.Password
-		Set-Secret -Name $onlyPassword -SecureStringSecret ($password | ConvertTo-SecureString -AsPlainText)
+	foreach ($onlyPassword in $onlyPasswords.GetEnumerator()) {
+		Write-Verbose "Setting secret '$($onlyPassword.Name)' from op"
+		$password = $onlyPassword.Value.Password | op inject
+		Set-Secret -Name $onlyPassword.Name -SecureStringSecret ($password | ConvertTo-SecureString -AsPlainText)
 	}
 
 	$logins = @{
@@ -43,14 +29,14 @@ function Set-LocalKeyChain {
 			Username = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/username"
 			Password = "op://CareEvolution.Infrastructure/uw4cpfxhjtzbpr7uefelhap25y/password"
 		}
-	} | Convert-Injectable
+	}
 
-	foreach ($login in $logins | Get-Member | Where-Object MemberType -EQ "NoteProperty" | Select-Object -ExpandProperty Name) {
-		$username = $logins.$login.Username
-		$password = $logins.$login.Password
-		Write-Verbose "Setting secret '$login' from op '$username'"
+	foreach ($login in $logins.GetEnumerator()) {
+		$username = $login.Value.Username | op inject
+		$password = $login.Value.Password | op inject
+		Write-Verbose "Setting secret '$($login.Name)' from op '$username'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
-		Set-Secret -Name $login -Secret $secretCredential
+		Set-Secret -Name $login.Name -Secret $secretCredential
 	}
 
 
@@ -63,13 +49,13 @@ function Set-LocalKeyChain {
 			Username = "op://Private/AWS Pep Access Key/username"
 			Credential = "op://Private/AWS Pep Access Key/credential"
 		}
-	} | Convert-Injectable
+	}
 
-	foreach ($apiCredential in $apiCredentials | Get-Member | Where-Object MemberType -EQ "NoteProperty" | Select-Object -ExpandProperty Name) {
-		$username = $apiCredentials.$apiCredential.Username
-		$credential = $apiCredentials.$apiCredential.Credential
-		Write-Verbose "Setting secret '$apiCredential' from op '$username'"
+	foreach ($apiCredential in $apiCredentials.GetEnumerator()) {
+		$username = $apiCredential.Value.Username | op inject
+		$credential = $apiCredential.Value.Credential | op inject
+		Write-Verbose "Setting secret '$($apiCredential.Name)' from op '$username'"
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($credential | ConvertTo-SecureString -AsPlainText)
-		Set-Secret -Name $apiCredential -Secret $secretCredential
+		Set-Secret -Name $apiCredential.Name -Secret $secretCredential
 	}
 }
