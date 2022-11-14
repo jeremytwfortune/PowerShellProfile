@@ -1,6 +1,7 @@
-Set-PSReadlineOption -BellStyle None
-Set-PSReadlineKeyHandler -Key Tab -Functio Complete
-Set-PSReadlineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
+Set-PSReadLineOption -BellStyle None
+Set-PSReadLineOption -PredictionSource None
+Set-PSReadLineKeyHandler -Key Tab -Functio Complete
+Set-PSReadLineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 
 [Net.ServicePointManager]::SecurityProtocol = "tls13, tls12"
 
