@@ -12,7 +12,8 @@ function Get-PromptShortPath {
 	$shortcutPath = if ( $shortcuts = $ShortcutDirectories.GetEnumerator() | ? { "$Path*" -Like "$($_.Value)*" } ) {
 		$shortcut = $shortcuts | Sort-Object -Property Value -Descending | Select-Object -First 1 # Hacky
 		$Path -Replace [regex]::Escape("$($shortcut.Value)"), "$($shortcut.Name)"
-	} else {
+	}
+ else {
 		$Path -Replace [regex]::Escape("Microsoft.PowerShell.Core\FileSystem::"), ""
 	}
 
@@ -31,10 +32,16 @@ function Get-PromptStatusBackgroundColor {
 
 function Write-PromptAwsProfile {
 	if ($Global:StoredAWSCredentials -And $Global:StoredAWSCredentials -ne "default") {
-		$color = $Global:StoredAWSCredentialPromptColor ?? "Gray"
 		$credentialName = $Global:StoredAWSCredentials.ToString()
 
-		"🔑 $credentialName" | New-PromptText -ForegroundColor Black -BackgroundColor $color
+		"🔑 $credentialName" | New-PromptText -ForegroundColor Black -BackgroundColor Blue
+	}
+}
+
+function Write-PromptAwsRegion {
+	$regionName = $Env:AWS_REGION ?? $Env:AWS_DEFAULT_REGION
+	if ($Global:StoredAWSCredentials -and $regionName) {
+		"🌎 $regionName" | New-PromptText -ForegroundColor Black -BackgroundColor DarkGray
 	}
 }
 
@@ -45,7 +52,8 @@ function Write-PromptGitHead {
 			$headReference = (git rev-parse HEAD 2>$Null).Substring(0, 8)
 		}
 		"  $headReference" | New-PromptText -ForegroundColor Black -BackgroundColor (Get-PromptStatusBackgroundColor)
-	} catch {}
+	}
+ catch {}
 }
 
 function Write-PromptPath {

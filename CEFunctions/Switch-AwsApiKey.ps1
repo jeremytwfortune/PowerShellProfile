@@ -4,7 +4,7 @@ function Switch-AwsApiKey {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory)]
-		[ValidateSet("Corp", "Pep", IgnoreCase=$False)]
+		[ValidateSet("Corp", "Pep", IgnoreCase = $False)]
 		$Environment
 	)
 
@@ -29,7 +29,7 @@ function Switch-AwsApiKey {
 		throw "Unable to read from op; Key $($newKey.AccessKeyId) has not been synced and should be removed."
 	}
 
-	op edit item "AWS $Environment Access Key" username=$($newKey.AccessKeyId) credential=$($newKey.SecretAccessKey) --vault "Private"
+	op item edit "AWS $Environment Access Key" username=$($newKey.AccessKeyId) credential=$($newKey.SecretAccessKey) --vault "Private"
 
 	Set-LocalKeyChain
 
