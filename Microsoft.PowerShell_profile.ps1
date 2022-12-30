@@ -33,18 +33,4 @@ if (Test-Path($ChocolateyProfile)) {
 
 . "$(Split-Path $PROFILE)\prompt.ps1"
 
-$Global:Prompt = @(
-	{ "`n" | New-PromptText -ForegroundColor White },
-	{ Write-PromptPath },
-	{ Write-PromptGitHead },
-	{ "`t" },
-	{ Write-PromptPythonVenv },
-	{ Write-PromptAwsRegion },
-	{ Write-PromptAwsProfile },
-	{ " " | New-PromptText -ForegroundColor White -BackgroundColor Black },
-	{ "`n" },
-	{ "&int;" | New-PromptText -ForegroundColor White -BackgroundColor Black }
-)
-
-Set-PowerLinePrompt -HideErrors -PowerLineFont
 Set-Location $Home

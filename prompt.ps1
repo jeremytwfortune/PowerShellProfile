@@ -41,7 +41,7 @@ function Write-PromptAwsProfile {
 function Write-PromptAwsRegion {
 	$regionName = $Env:AWS_REGION ?? $Env:AWS_DEFAULT_REGION
 	if ($Global:StoredAWSCredentials -and $regionName) {
-		"🌎 $regionName" | New-PromptText -ForegroundColor Black -BackgroundColor DarkGray
+		"🌎 $regionName" | New-PromptText -ForegroundColor Black -BackgroundColor Green
 	}
 }
 
@@ -57,7 +57,7 @@ function Write-PromptGitHead {
 }
 
 function Write-PromptPath {
-	"📁 $(Get-PromptShortPath -Path (Get-Location))" | New-PromptText
+	"📁 $(Get-PromptShortPath -Path (Get-Location))" | New-PromptText -BackgroundColor Cyan
 }
 
 function Write-PromptPythonVenv {
@@ -66,3 +66,21 @@ function Write-PromptPythonVenv {
 		"&#128013; $venvName" | New-PromptText -ForegroundColor Black -BackgroundColor Blue
 	}
 }
+
+function Write-CharacterPrompt {
+	"&int; " | New-PromptText
+}
+
+$Global:Prompt = @(
+	{ "`n" | New-PromptText -ForegroundColor White },
+	{ Write-PromptPath },
+	{ Write-PromptGitHead },
+	{ "`t" },
+	{ Write-PromptPythonVenv },
+	{ Write-PromptAwsRegion },
+	{ Write-PromptAwsProfile },
+	{ "`n" },
+	{ Write-CharacterPrompt }
+)
+
+Set-PowerLinePrompt -HideErrors -PowerLineFont -Colors $Null, $Null

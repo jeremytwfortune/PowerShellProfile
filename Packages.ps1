@@ -43,7 +43,6 @@ Install-AWSToolsModule -Name `
 Copy-Item "$PSScriptRoot\ProgramList.txt" $HOME
 Copy-Item "$PSScriptRoot\AwsAssumableRoles.txt" $HOME
 Copy-Item "$PSScriptRoot\global.gitconfig" "$HOME\.gitconfig"
-"{}" | Out-File "$Home\CeServers.json"
 
 if ( $Machine -in ("Work", "Home") ) {
 	choco install -y `
@@ -68,13 +67,11 @@ if ( $Machine -in ("Work", "Home") ) {
 if ( $Machine -eq "Work" ) {
 	choco install -y `
 		amazon-workspaces `
-		visualstudio2019enterprise `
-		citrix-receiver `
+		visualstudio2022professional `
 		nuget.commandline `
 		dotnetcore-sdk `
-		ssms
-
-	choco install -y nodejs --version 12.19.0
+		ssms `
+		nodejs
 
 	"IIS-ASPNET45",
 	"Windows-Identity-Foundation",
@@ -91,7 +88,6 @@ if ( $Machine -eq "Work" ) {
 if ( $Machine -eq "WorkSpace") {
 	choco uninstall -y `
 		aws-vault `
-		awscli `
 		filezilla `
 		gitextensions `
 		GPMC `
