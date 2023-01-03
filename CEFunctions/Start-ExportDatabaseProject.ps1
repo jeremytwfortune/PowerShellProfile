@@ -6,7 +6,10 @@ function Start-ExportDatabaseProject {
 		[string] $Environment,
 
 		[Parameter(ValueFromPipeline)]
-		[string] $ProjectName
+		[string] $ProjectName,
+
+		[Parameter()]
+		[hashtable] $ContainerEnvironment = $Null
 	)
 
 	begin {
@@ -20,7 +23,12 @@ function Start-ExportDatabaseProject {
 					s3 = @{ object = @{ key = "$ProjectName/manual" } }
 				}
 			)
-		} | ConvertTo-Json -Compress -Depth 20
-		Invoke-LMFunction -FunctionName $functionName -Payload $payload
+		}
+		if ($ContainerEnvironment) {
+			$payload.Environment = $ContainerEnvironment
+		}
+
+		$jsonPayload = $payload | ConvertTo-Json -Compress -Depth 20
+		Invoke-LMFunction -FunctionName $functionName -Payload $jsonPayload
 	}
 }
