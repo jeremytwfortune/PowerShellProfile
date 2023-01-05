@@ -1,12 +1,5 @@
-foreach ($module in "SSO", "SSOOIDC") {
-	$toolsDirectory = Get-ChildItem "$((Get-Item $PROFILE).Directory)\Modules\AWS.Tools.$module" |
-		Sort-Object LastWriteTime -Descending |
-		Select-Object -First 1
-	$dll = "$toolsDirectory\AWSSDK.${module}.dll"
-	if ( Test-Path $dll ) {
-		Add-Type -Path $dll
-	}
-}
+Import-Module AWS.Tools.SSO
+Import-Module AWS.Tools.SSOOIDC
 
 Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | % {
 	. $_.FullName
