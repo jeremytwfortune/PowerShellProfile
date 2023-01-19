@@ -8,7 +8,7 @@
   autocrlf = true
   editor = code --wait
   ignorecase = true
-	longpaths = true
+  longpaths = true
 [alias]
   clog = log --oneline --left-right --name-only --no-merges
   flog = log --pretty=format:\"%C(yellow)%h %C(black)%G? %<(12,trunc)%C(cyan)%an %<(12,trunc)%C(green)%ar%>(1)%C(auto)%d%Creset%s\" --no-merges

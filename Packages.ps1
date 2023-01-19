@@ -3,14 +3,12 @@ param (
 	$Machine
 )
 
-Set-ExecutionPolicy Bypass; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
-choco install -y `
-	googlechrome `
-	powershell-core `
-	vscode `
-	7zip `
-	git
+"Microsoft.PowerShell",
+"Microsoft.VisualStudioCode",
+"Git.Git",
+"7zip.7Zip" | ForEach-Object {
+	winget install $_
+}
 
 refreshenv
 
@@ -38,40 +36,43 @@ Install-AWSToolsModule -Name `
 	AWS.Tools.SecretsManager, `
 	AWS.Tools.SecurityToken, `
 	AWS.Tools.SimpleNotificationService, `
-	AWS.Tools.WorkSpaces
+	AWS.Tools.WorkSpaces, `
+	AWS.Tools.SSO, `
+	AWS.Tools.SSOOIDC
 
-Copy-Item "$PSScriptRoot\ProgramList.txt" $HOME
-Copy-Item "$PSScriptRoot\AwsAssumableRoles.txt" $HOME
+
 Copy-Item "$PSScriptRoot\global.gitconfig" "$HOME\.gitconfig"
 
 if ( $Machine -in ("Work", "Home") ) {
-	choco install -y `
-		autohotkey `
-		office365proplus `
-		microsoft-windows-terminal `
-		f.lux.install `
-		rainmeter `
-		windirstat `
-		sharex `
-		slack `
-		gimp `
-		licecap `
-		ag `
-		gpg4win `
-		vim `
+	"AutoHotkey.AutoHotkey",
+	"flux.flux",
+	"Rainmeter.Rainmeter",
+	"ShareX.ShareX",
+	"SlackTechnologies.Slack",
+	"GIMP.GIMP",
+	"LICEcap.LICEcap",
+	"ag.ag",
+	"Gpg4win.Gpg4win",
+	"GnuPG.Gpg4win",
+	"Vim.Vim",
+	"Microsoft.PowerToys" | ForEach-Object {
+		winget install $_
+	}
 
 	Copy-Item "$PSScriptRoot\wt-admin.lnk" $HOME
 	Copy-Item "$PSScriptRoot\AutoHotKey.ahk" "$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
 }
 
 if ( $Machine -eq "Work" ) {
-	choco install -y `
-		amazon-workspaces `
-		visualstudio2022professional `
-		nuget.commandline `
-		dotnetcore-sdk `
-		ssms `
-		nodejs
+	"Amazon.WorkspacesClient",
+	"Microsoft.VisualStudio.2019.Professional",
+	"Microsoft.VisualStudio.2022.Professional",
+	"Microsoft.NuGet",
+	"Microsoft.DotNet.SDK.7",
+	"Microsoft.SQLServerManagementStudio",
+	"OpenJS.NodeJS.LTS" | ForEach-Object {
+		winget install $_
+	}
 
 	"IIS-ASPNET45",
 	"Windows-Identity-Foundation",

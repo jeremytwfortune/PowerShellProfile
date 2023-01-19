@@ -6,8 +6,8 @@ My personal windows profile. Exists primarily to sync between different machines
 
 Download fonts and install:
 
-- https://github.com/andreberg/Meslo-Font
-- https://github.com/belluzj/fantasque-sans
+- <https://github.com/andreberg/Meslo-Font>
+- <https://github.com/belluzj/fantasque-sans>
 
 ### Packages
 
@@ -25,6 +25,27 @@ Copy `.\Rainmeter` settings to `$Home\Documents\Rainmeter\Skins`.
 
 ### Terminal
 
-- Install Windows Terminal from the Microsoft Store.
 - Ensure AutoHotKey is [installed with UI access](https://documentation.help/AutoHotKey-Functions/FAQ.htm#uac).
-- Copy profiles.json content
+- Copy WindowsTerminal.settings.json content
+
+### GPG
+
+Download the GPG private key.
+
+```powershell
+gpg --import .\key.pvt
+gpg --edit-key 35E40FA7
+```
+
+Add both sign and encrypt RSA keys
+
+```powershell
+gpg --with-keygrip --list-key 35E40FA7
+```
+
+Select the keygrip and
+
+```powershell
+$keygrip = ""
+Remove-Item "$home\AppData\Roaming\.gnupg\private-keys-v1.d\${keygrip}.key"
+```

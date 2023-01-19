@@ -11,7 +11,7 @@ $Repos = "$Home\Repos"
 $Drive = "G:\My Drive"
 
 $Env:Path = "$Env:Path;$Home\Documents\WindowsPowerShell\Scripts"
-$Env:Path = "$Env:Path;C:\Program Files\Git\usr\bin"
+$Env:Path = "$Env:Path;C:\Program Files\Git\bin;C:\Program Files (x86)\GnuPG\bin\"
 
 $Env:VIRTUAL_ENV_DISABLE_PROMPT = $True
 
