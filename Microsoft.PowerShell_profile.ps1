@@ -10,14 +10,15 @@ $Desk = "$Home\Desktop"
 $Repos = "$Home\Repos"
 $Drive = "G:\My Drive"
 
-$Env:Path = "$Env:Path;$Home\Documents\WindowsPowerShell\Scripts"
-$Env:Path = "$Env:Path;C:\Program Files\Git\bin;C:\Program Files (x86)\GnuPG\bin\"
-
-$Env:VIRTUAL_ENV_DISABLE_PROMPT = $True
-
 Get-ChildItem "$(Split-Path $PROFILE)\Functions" | % {
 	. $_.FullName
 }
+
+$Env:Path = "$Env:Path;$Home\Documents\WindowsPowerShell\Scripts"
+$Env:Path = "$Env:Path;C:\Program Files\Git\bin;C:\Program Files (x86)\GnuPG\bin\"
+Update-EnvironmentPath
+
+$Env:VIRTUAL_ENV_DISABLE_PROMPT = $True
 
 $Global:CredentialStore = @{}
 

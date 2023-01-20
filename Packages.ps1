@@ -46,7 +46,6 @@ Copy-Item "$PSScriptRoot\global.gitconfig" "$HOME\.gitconfig"
 if ( $Machine -in ("Work", "Home") ) {
 	"AutoHotkey.AutoHotkey",
 	"flux.flux",
-	"Rainmeter.Rainmeter",
 	"ShareX.ShareX",
 	"SlackTechnologies.Slack",
 	"GIMP.GIMP",
@@ -70,7 +69,9 @@ if ( $Machine -eq "Work" ) {
 	"Microsoft.NuGet",
 	"Microsoft.DotNet.SDK.7",
 	"Microsoft.SQLServerManagementStudio",
-	"OpenJS.NodeJS.LTS" | ForEach-Object {
+	"OpenJS.NodeJS.LTS",
+	"GitHub.cli",
+	"Amazon.AWSCLI" | ForEach-Object {
 		winget install $_
 	}
 
