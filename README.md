@@ -17,15 +17,8 @@ Download fonts and install:
 
 Grab non-profile-directory configuration from [this gist](https://gist.github.com/jeremytwfortune/fe850de4eb384b2c78812bf2c0b97e64).
 
-### Rainmeter Skins
-
-- [Translucent Taskbar](https://www.deviantart.com/arkenthera/art/TranslucentTaskbar-1-2-656402039)
-
-Copy `.\Rainmeter` settings to `$Home\Documents\Rainmeter\Skins`.
-
 ### Terminal
 
-- Ensure AutoHotKey is [installed with UI access](https://documentation.help/AutoHotKey-Functions/FAQ.htm#uac).
 - Copy WindowsTerminal.settings.json content
 
 ### GPG

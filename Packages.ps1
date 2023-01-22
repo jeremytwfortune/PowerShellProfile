@@ -44,7 +44,6 @@ Install-AWSToolsModule -Name `
 Copy-Item "$PSScriptRoot\global.gitconfig" "$HOME\.gitconfig"
 
 if ( $Machine -in ("Work", "Home") ) {
-	"AutoHotkey.AutoHotkey",
 	"flux.flux",
 	"ShareX.ShareX",
 	"SlackTechnologies.Slack",
@@ -57,9 +56,6 @@ if ( $Machine -in ("Work", "Home") ) {
 	"Microsoft.PowerToys" | ForEach-Object {
 		winget install $_
 	}
-
-	Copy-Item "$PSScriptRoot\wt-admin.lnk" $HOME
-	Copy-Item "$PSScriptRoot\AutoHotKey.ahk" "$HOME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
 }
 
 if ( $Machine -eq "Work" ) {
