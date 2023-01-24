@@ -6,7 +6,7 @@ Set-PSReadLineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 [Net.ServicePointManager]::SecurityProtocol = "tls13, tls12"
 
 $Work = "$Home\Work"
-$Desk = "$Home\Desktop"
+$Desk = "$Home\OneDrive\Desktop"
 $Repos = "$Home\Repos"
 $Drive = "G:\My Drive"
 
