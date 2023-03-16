@@ -22,6 +22,7 @@ function Set-AwsDefaultSession {
 	catch {
 		Write-Verbose "Logging into SSO"
 		aws sso login
+		bash -c "aws sso login"
 	}
 	Set-Profile $ProfileName
 }
