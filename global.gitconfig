@@ -16,6 +16,7 @@
   ca = commit --amend
   pushu = "!git push -u origin \"$(git rev-parse --abbrev-ref HEAD)\""
   difft = "!git difftool -yx 'code --diff --wait'"
+  root = 'rev-parse --show-toplevel'
 [push]
   default = simple
 [credential]
