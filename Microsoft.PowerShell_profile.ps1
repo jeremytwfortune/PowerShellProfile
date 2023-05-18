@@ -3,6 +3,13 @@ Set-PSReadLineOption -PredictionSource None
 Set-PSReadLineKeyHandler -Key Tab -Functio Complete
 Set-PSReadLineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 
+Get-ChildItem "${env:ProgramFiles}\gsudo" |
+	Sort-Object CreationTime -Descending |
+	Select-Object -First 1 -ExpandProperty FullName |
+	Get-ChildItem |
+	Where-Object { $_.Name -eq "gsudoModule.psd1" } |
+	Import-Module
+
 [Net.ServicePointManager]::SecurityProtocol = "tls13, tls12"
 
 $Work = "$Home\Work"

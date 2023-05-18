@@ -76,6 +76,7 @@ if ( $Machine -eq "Work" ) {
 	"WCF-HTTP-Activation",
 	"WCF-HTTP-Activation45",
 	"IIS-ManagementScriptingTools",
+	"IIS-ManagementConsole",
 	"MSMQ-Server",
 	"MSMQ-ADIntegration",
 	"MSMQ-HTTP" | ForEach-Object {

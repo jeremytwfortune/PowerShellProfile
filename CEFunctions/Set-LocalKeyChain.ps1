@@ -38,24 +38,4 @@ function Set-LocalKeyChain {
 		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($password | ConvertTo-SecureString -AsPlainText)
 		Set-Secret -Name $login.Name -Secret $secretCredential
 	}
-
-
-	$apiCredentials = @{
-		"aws.amazon.com/iam/corp" = @{
-			Username = "op://Private/AWS Corp Access Key/username"
-			Credential = "op://Private/AWS Corp Access Key/credential"
-		}
-		"aws.amazon.com/iam/pep" = @{
-			Username = "op://Private/AWS Pep Access Key/username"
-			Credential = "op://Private/AWS Pep Access Key/credential"
-		}
-	}
-
-	foreach ($apiCredential in $apiCredentials.GetEnumerator()) {
-		$username = $apiCredential.Value.Username | op inject
-		$credential = $apiCredential.Value.Credential | op inject
-		Write-Verbose "Setting secret '$($apiCredential.Name)' from op '$username'"
-		$secretCredential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, ($credential | ConvertTo-SecureString -AsPlainText)
-		Set-Secret -Name $apiCredential.Name -Secret $secretCredential
-	}
 }
