@@ -26,7 +26,6 @@ $Env:Path = "$Env:Path;C:\Program Files\Git\bin;C:\Program Files (x86)\GnuPG\bin
 Update-EnvironmentPath
 
 $Env:VIRTUAL_ENV_DISABLE_PROMPT = $True
-$Env:PAGER = "vim -"
 
 $Global:CredentialStore = @{}
 
