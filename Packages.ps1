@@ -6,7 +6,10 @@ param (
 "Microsoft.PowerShell",
 "Microsoft.VisualStudioCode",
 "Git.Git",
-"7zip.7Zip" | ForEach-Object {
+"7zip.7Zip"
+"vim.vim"
+"gerardog.gusudo"
+"GitHub.cli" | ForEach-Object {
 	winget install $_
 }
 
