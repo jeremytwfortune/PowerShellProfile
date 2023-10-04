@@ -3,7 +3,7 @@ function New-OrchestrateHeaders {
 	param()
 
 	@{
-		"X-Api-Key" = Get-Secret "Rosetta" -AsPlainText
+		"X-Api-Key" = Get-Secret "Orchestrate" -AsPlainText
 		"Content-Type" = "application/json"
 		Accept = "application/json"
 	}

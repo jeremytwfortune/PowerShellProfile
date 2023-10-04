@@ -2,7 +2,7 @@ function New-OrchestrateTokenHeaders {
 	[CmdletBinding()]
 	param(
 		[Parameter()]
-		[string] $Url = "https://api.rosetta.careevolution.com"
+		[string] $Url = "https://api.careevolutionapi.com"
 	)
 
 	$tokenUrl = "$Url/token"
