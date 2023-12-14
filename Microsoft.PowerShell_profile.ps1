@@ -3,8 +3,6 @@ Set-PSReadLineOption -PredictionSource None
 Set-PSReadLineKeyHandler -Key Tab -Functio Complete
 Set-PSReadLineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 
-Import-GsudoModule
-
 [Net.ServicePointManager]::SecurityProtocol = "tls13, tls12"
 
 $Work = "$Home\Work"
@@ -19,6 +17,8 @@ Get-ChildItem "$(Split-Path $PROFILE)\Functions" | % {
 $Env:Path = "$Env:Path;$Home\Documents\WindowsPowerShell\Scripts"
 $Env:Path = "$Env:Path;C:\Program Files\Git\bin;C:\Program Files (x86)\GnuPG\bin\"
 Update-EnvironmentPath
+
+Import-GsudoModule
 
 $Env:VIRTUAL_ENV_DISABLE_PROMPT = $True
 

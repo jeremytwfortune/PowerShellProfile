@@ -1,6 +1,3 @@
-Import-Module AWS.Tools.SSO
-Import-Module AWS.Tools.SSOOIDC
-
 Get-ChildItem "$(Split-Path $PROFILE)\CEFunctions" | % {
 	. $_.FullName
 }
