@@ -4,7 +4,10 @@ function Set-AwsDefaultSession {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory)]
-		[string] $ProfileName
+		[string] $ProfileName,
+
+		[Parameter()]
+		[switch] $IncludeWsl
 	)
 
 	function Set-Profile {
@@ -13,6 +16,8 @@ function Set-AwsDefaultSession {
 		Set-AWSCredential -ProfileName $ProfileName -Scope Global
 	}
 
+	Import-Module AWS.Tools.SSO
+	Import-Module AWS.Tools.SSOOIDC
 
 	try {
 		if (-Not (Get-STSCallerIdentity -ProfileName $ProfileName -ErrorAction SilentlyContinue)) {
@@ -22,7 +27,9 @@ function Set-AwsDefaultSession {
 	catch {
 		Write-Verbose "Logging into SSO"
 		aws sso login
-		bash -c "aws sso login"
+		if ($IncludeWsl) {
+			bash -c "aws sso login"
+		}
 	}
 	Set-Profile $ProfileName
 }
