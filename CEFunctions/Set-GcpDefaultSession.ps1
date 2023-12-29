@@ -8,14 +8,14 @@ function Set-GcpDefaultSession {
 	$accounts = gcloud auth list --format=json | ConvertFrom-Json
 	if ($accounts.Count -eq 0) {
 		gcloud auth login
-		# gcloud auth login --update-adc
+		gcloud auth application-default login
 	}
 
 	if (-not $Project) {
 		return
 	}
 
-	# gcloud auth application-default set-quota-project $Project
+	gcloud auth application-default set-quota-project $Project
 	gcloud config set project $Project
 }
 
