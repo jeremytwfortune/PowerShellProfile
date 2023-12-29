@@ -34,15 +34,23 @@ function Write-PromptAwsProfile {
 	if ($Global:StoredAWSCredentials -And $Global:StoredAWSCredentials -ne "default") {
 		$credentialName = $Global:StoredAWSCredentials.ToString()
 
-		"🔑 $credentialName" | New-PromptText -ForegroundColor Black -BackgroundColor Blue
+		$regionName = $Env:AWS_REGION ?? $Env:AWS_DEFAULT_REGION ?? ""
+
+		"🧼 $credentialName ($regionName)" | New-PromptText -ForegroundColor Black -BackgroundColor Blue
 	}
 }
 
-function Write-PromptAwsRegion {
-	$regionName = $Env:AWS_REGION ?? $Env:AWS_DEFAULT_REGION
-	if ($Global:StoredAWSCredentials -and $regionName) {
-		"🌎 $regionName" | New-PromptText -ForegroundColor Black -BackgroundColor Green
+function Write-PromptGcpProfile {
+	$default = Get-Content -Path "${env:APPDATA}/gcloud/configurations/config_default" -ErrorAction SilentlyContinue
+	if (-Not $default) {
+		return
 	}
+	$default = $default -replace '^\[core\]$', '' | ConvertFrom-StringData
+	if (-not $default.account) {
+		return
+	}
+
+	"☁️ $($default.project)" | New-PromptText -ForegroundColor Black -BackgroundColor Green
 }
 
 function Write-PromptGitHead {
@@ -77,7 +85,7 @@ $Global:Prompt = @(
 	{ Write-PromptGitHead },
 	{ "`t" },
 	{ Write-PromptPythonVenv },
-	{ Write-PromptAwsRegion },
+	{ Write-PromptGcpProfile },
 	{ Write-PromptAwsProfile },
 	{ "`n" },
 	{ Write-CharacterPrompt }
