@@ -15,7 +15,7 @@ function Set-GcpDefaultSession {
 		return
 	}
 
-	gcloud auth application-default set-quota-project $Project
+	gcloud auth application-default set-quota-project terraform-state-409420
 	gcloud config set project $Project
 }
 
