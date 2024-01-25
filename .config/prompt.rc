@@ -1,0 +1,2 @@
+PROMPT_COMMAND=''; PS1='\n📁\[\e[1m\]\w \n\$ \[\e[0m\]'
+
