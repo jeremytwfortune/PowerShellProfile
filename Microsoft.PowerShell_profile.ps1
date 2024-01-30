@@ -5,10 +5,10 @@ Set-PSReadLineKeyHandler -Key "Ctrl+d" -Functio DeleteCharOrExit
 
 [Net.ServicePointManager]::SecurityProtocol = "tls13, tls12"
 
-$Work = "$Home\Work"
-$Desk = "$Home\Desktop"
-$Repos = "$Home\Repos"
-$Drive = "G:\My Drive"
+$WinHome = $IsWindows ? $Home : "/mnt/c/Users/$(wslvar USERNAME)"
+$Desk = $IsWindows ? "$Home\Desktop" : "$WinHome/Desktop"
+$Repos = $IsWindows ? "$Home\Repos" : "$WinHome/Repos"
+$Drive = $IsWindows ? "G:\My Drive" : "/mnt/g/My Drive"
 
 Get-ChildItem "$(Split-Path $PROFILE)\Functions" | % {
 	. $_.FullName
