@@ -19,7 +19,7 @@ if ( $Machine -eq "WorkSpace" ) {
 		7zip `
 		vim `
 		gsudo `
-		github-cli
+		gh
 }
 
 refreshenv
