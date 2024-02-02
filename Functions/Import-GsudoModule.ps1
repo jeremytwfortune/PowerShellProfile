@@ -5,7 +5,15 @@ function Import-GsudoModule {
 		return
 	}
 
-	Get-ChildItem "${env:ProgramFiles}\gsudo" |
+	$toolsPath = "C:\tools\gsudo\Current"
+	$programFilesPath = "${env:ProgramFiles}\gsudo"
+
+	if (Test-Path $toolsPath) {
+		Import-Module "$toolsPath\gsudoModule.psd1"
+		return
+	}
+
+	Get-ChildItem $programFilesPath |
 		Sort-Object CreationTime -Descending |
 		Select-Object -First 1 -ExpandProperty FullName |
 		Get-ChildItem |

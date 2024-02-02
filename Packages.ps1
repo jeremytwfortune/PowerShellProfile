@@ -3,14 +3,23 @@ param (
 	$Machine
 )
 
-"Microsoft.PowerShell",
-"Microsoft.VisualStudioCode",
-"Git.Git",
-"7zip.7Zip"
-"vim.vim"
-"gerardog.gusudo"
-"GitHub.cli" | ForEach-Object {
-	winget install $_
+if ( $Machine -in @("Work", "Home") ) {
+	"Microsoft.PowerShell",
+	"Microsoft.VisualStudioCode",
+	"Git.Git",
+	"7zip.7Zip"
+	"vim.vim"
+	"gerardog.gsudo"
+	"GitHub.cli" | ForEach-Object {
+		winget install $_
+	}
+}
+if ( $Machine -eq "WorkSpace" ) {
+	choco install -y `
+		7zip `
+		vim `
+		gsudo `
+		github-cli
 }
 
 refreshenv
