@@ -3,7 +3,6 @@ function Get-PromptShortPath {
 		[string] $Path,
 		[hashtable] $ShortcutDirectories = @{
 			Home = $Home;
-			Work = $Work;
 			Desk = $Desk;
 			Drive = $Drive;
 			Repos = $Repos
