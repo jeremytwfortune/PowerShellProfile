@@ -98,6 +98,4 @@ if ( $Machine -eq "WorkSpace") {
 		rdmfree `
 		rdtabs `
 		putty
-
-	choco install -y conemu
 }
