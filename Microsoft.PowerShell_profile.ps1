@@ -22,7 +22,12 @@ Import-GsudoModule
 
 $Env:VIRTUAL_ENV_DISABLE_PROMPT = $True
 
-. "$(Split-Path $PROFILE)\CareEvolution.ps1"
+if ($Env:JWTF_WORKSPACE -eq 1) {
+	. "$(Split-Path $PROFILE)\CareEvolution-WorkSpace.ps1"
+}
+else {
+	. "$(Split-Path $PROFILE)\CareEvolution.ps1"
+}
 
 function Invoke-GitStatus { git status }; Set-Alias gits Invoke-GitStatus
 
